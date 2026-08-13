@@ -1,73 +1,47 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { DataBase } from "@/src/types/database";
+import { env } from "../env";
 
-export async function updateSession(
-  request: NextRequest
-) {
-  let response = NextResponse.next({
-    request,
-  })
+const PUBLIC_PATHS = ['/login','/auth']
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
+export async function updateSession(request:NextRequest){
+    let response = NextResponse.next({request})
+
+    const supabase = createServerClient<DataBase>(env.NEXT_PUBLIC_URL,env.NEXT_PUBLIC_SUPABASE_ANON_KEY,{
+        cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
-
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(
-            ({ name, value }) => {
-              request.cookies.set(name, value)
-            }
-          )
-
-          response = NextResponse.next({
-            request,
-          })
-
-          cookiesToSet.forEach(
-            ({ name, value, options }) => {
-              response.cookies.set(
-                name,
-                value,
-                options
-              )
-            }
-          )
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
         },
       },
-    }
-  )
+    })
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    const {
+        data: {user}
+    } = await supabase.auth.getUser();
 
-  const protectedRoutes = [
-    '/dashboard',
-    '/my-bookings',
-  ]
+    const { pathname } = request.nextUrl;
+  const isPublic = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
 
-  const isProtectedRoute =
-    protectedRoutes.some((route) =>
-      request.nextUrl.pathname.startsWith(route)
-    )
-
-  if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone()
-
-    url.pathname = '/login'
-
-    url.searchParams.set(
-      'redirectTo',
-      request.nextUrl.pathname
-    )
-
-    return NextResponse.redirect(url)
+  if (!user && !isPublic) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
   }
 
-  return response
+  if(user && pathname === '/login'){
+    const url = request.nextUrl.clone();
+    url.pathname = '/resources'
+    return NextResponse.redirect(url);
+  }
+
+  return response;
+  
 }
