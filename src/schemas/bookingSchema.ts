@@ -6,7 +6,6 @@ export const bookingSchema = z.object({
     .min(2, "Name must be at least 2 characters"),
 
   email: z
-    .string()
     .email("Please enter a valid email address"),
 
   date: z
