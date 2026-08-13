@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { DataBase } from "@/src/types/database";
+import { DataBase } from "@/types/database";
 import { env } from "../env";
 
 const PUBLIC_PATHS = ['/login','/auth']
