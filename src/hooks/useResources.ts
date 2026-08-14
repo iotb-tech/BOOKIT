@@ -1,8 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase/client";
-import { getResources } from "@/lib/supabase/resources";
+import { createClient } from "@/lib/supabase/client";
+import { getResources } from "@/lib/resources";
+
+const supabase = createClient();
 
 export function useResources() {
   const query = useQuery({
