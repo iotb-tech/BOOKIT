@@ -1,3 +1,8 @@
+export type ResourceStatus =
+  | "available"
+  | "limited"
+  | "unavailable";
+
 export interface Resource {
   id: string;
   name: string;
@@ -8,4 +13,5 @@ export interface Resource {
   skills?: string[];
   duration_minutes?: number;
   created_at?: string;
+  status?: ResourceStatus;
 }
