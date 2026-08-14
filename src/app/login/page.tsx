@@ -1,52 +1,58 @@
-'use client'
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import LoginForm from "@/components/auth/LoginForm";
 
-function Signup(){
-  const router = useRouter()
-  const supabase = createClient()
-  
-  const [email,setEmail] = useState('')
-  const [password,setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+export default function LoginPage() {
 
-    async function handleSubmit(event:React.FormEvent){
-      event.preventDefault();
-      setError(null)
+const searchParams = useSearchParams();
 
-      const {error: hotError} = await supabase.auth.signInWithPassword({email,password})
+// Get the page the user originally wanted to visit.
+const redirectTo = searchParams.get("redirectTo") || "/my-bookings";
 
-      if(hotError){
-        setError(hotError.message)
-        return
-      }
 
-      router.refresh()
-      router.push('/')
-      
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    setError("");
+
+    const result = loginSchema.safeParse({
+      email,
+      password,
+    });
+
+    if (!result.success) {
+      setError(result.error.issues[0].message);
+      return;
     }
 
+    setLoading(true);
 
-    return (
-        <>
-        <form onSubmit={handleSubmit} className="p-8 bg-primary-300 flex flex-col gap-3 w-100">
-            <div className="text-white text-4xl">Book<span className="text-primary-500">IT</span></div>
-            <div className="gap-2">
-            <label htmlFor="mail">Email</label>
-            <input value={email} onChange={e=> setEmail(e.target.value)}  className="bg-white border border-2-solid block w-full" type="email" id="mail" placeholder="email@example.com"/>
+    const supabase = createClient();
 
-            </div>
-            <div className="gap-2 flex-col">
-            <label htmlFor="password">Password</label>
-            <input value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-white block" type="password" id="password" placeholder=""/>
+    const { error } = await supabase.auth.signInWithPassword({
+      email: result.data.email,
+      password: result.data.password,
+    });
 
-            </div>
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
 
-            <button className="bg-green-400 ">Login</button>
-        </form>
-        </>
-    )
+     // Send the user back to the page they originally requested.
+    router.push(redirectTo); 
+    router.refresh();
+  }
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
+      <LoginForm />
+    </main>
+  );
 }
-
-export default Signup

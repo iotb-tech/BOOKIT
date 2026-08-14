@@ -1,7 +1,7 @@
 import {z} from "zod";
 
 const envSchema = z.object({
-    NEXT_PUBLIC_URL: z.url({
+    NEXT_PUBLIC_SUPABASE_URL: z.url({
         message: "must be your Supabase project URL, e.g. https://abcd1234.supabase.co"
     }),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20,{message: 'looks too short — did you paste the whole key?'})
