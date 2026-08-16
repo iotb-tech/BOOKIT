@@ -1,12 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Resource } from "@/types/resource";
 
+const RESOURCE_FIELDS =
+  "id, name, description, owner_id, created_at, type, skills, duration_minutes, status";
+
 export async function getResources(
   supabase: SupabaseClient
 ): Promise<Resource[]> {
   const { data, error } = await supabase
     .from("resources")
-    .select("*")
+    .select(RESOURCE_FIELDS)
     .order("name", { ascending: true });
 
   if (error) {
@@ -22,7 +25,7 @@ export async function getResourceById(
 ): Promise<Resource | null> {
   const { data, error } = await supabase
     .from("resources")
-    .select("*")
+    .select(RESOURCE_FIELDS)
     .eq("id", id)
     .maybeSingle();
 
