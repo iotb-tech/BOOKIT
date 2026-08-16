@@ -1,7 +1,6 @@
-// components/resources/ResourceList.tsx
 'use client'
 import { useState, useMemo } from 'react'
-import { useResources } from '@/lib/resources/hooks'
+import { useResources } from '@/hooks/useResources'
 import { ResourceCard } from './ResourceCard'
 import { ResourceListSkeleton } from './ResourceListSkeleton'
 import { ResourceError } from './ResourceError'
@@ -11,18 +10,18 @@ import { ResourceStatus } from '@/types/resource'
 const FILTERS: { label: string; value: ResourceStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
   { label: 'Available', value: 'available' },
-  { label: 'Limited', value: 'limited' },
+  { label: 'Maintenance', value: 'maintenance' },
   { label: 'Unavailable', value: 'unavailable' },
 ]
 
 export function ResourceList() {
-  const { data, isLoading, isError, refetch } = useResources()
+  const { resources, isLoading, isError, refetch } = useResources()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | 'all'>('all')
 
   const filtered = useMemo(() => {
-    if (!data) return []
-    return data.filter((r) => {
+    if (!resources) return []
+    return resources.filter((r) => {
       const matchesSearch =
         r.name.toLowerCase().includes(search.toLowerCase()) ||
         (r.owner_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
@@ -30,12 +29,14 @@ export function ResourceList() {
       const matchesStatus = statusFilter === 'all' || r.status === statusFilter
       return matchesSearch && matchesStatus
     })
-  }, [data, search, statusFilter])
+  }, [resources, search, statusFilter])
 
   return (
-    <div className="p-4 sm:p-6">
-      <h1 className="text-2xl font-bold sm:text-3xl">All Resources</h1>
-      <p className="text-sm text-neutral-600 mt-1">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <h1 className="text-3xl font-bold tracking-tight text-white">
+        All Resources
+      </h1>
+      <p className="text-sm text-white mt-1">
         Find mentors or study groups and book a time that works for you.
       </p>
 
@@ -43,7 +44,7 @@ export function ResourceList() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search resources, mentors, or study groups..."
-        className="mt-4 w-full sm:max-w-md border border-neutral-200 rounded px-3 py-2.5 text-sm"
+        className="mt-5 w-full sm:max-w-md border border-neutral-200 bg-white rounded-lg px-3 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
       />
 
       <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
@@ -51,10 +52,10 @@ export function ResourceList() {
           <button
             key={f.value}
             onClick={() => setStatusFilter(f.value)}
-            className={`text-sm px-3 py-1.5 rounded-full whitespace-nowrap border ${
+            className={`text-sm px-3 py-1.5 rounded-full whitespace-nowrap border transition-colors ${
               statusFilter === f.value
                 ? 'bg-primary-600 text-white border-primary-600'
-                : 'border-neutral-200 text-neutral-600'
+                : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-300'
             }`}
           >
             {f.label}

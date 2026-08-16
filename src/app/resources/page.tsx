@@ -1,9 +1,5 @@
-import React from 'react'
+import { ResourceList } from '@/components/resources/ResourceList'
 
-export default function Resources() {
-  return (
-    <div>
-      This is resources
-    </div>
-  )
+export default function ResourcesPage() {
+  return <ResourceList />
 }

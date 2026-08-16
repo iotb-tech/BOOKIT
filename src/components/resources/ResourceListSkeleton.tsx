@@ -1,6 +1,6 @@
 export function ResourceListSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+    <div className=" bg-white grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="border border-neutral-200 rounded-lg p-4 animate-pulse">
           <div className="flex items-center gap-3">

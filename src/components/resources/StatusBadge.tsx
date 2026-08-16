@@ -1,24 +1,22 @@
-// components/resources/StatusBadge.tsx
+// src/components/resources/StatusBadge.tsx
 import { ResourceStatus } from '@/types/resource'
 
 const STATUS_STYLES: Record<ResourceStatus, string> = {
   available: 'bg-success/10 text-success',
-  limited: 'bg-warning/10 text-warning',
   unavailable: 'bg-error/10 text-error',
+  maintenance: 'bg-warning/10 text-warning',
 }
 
 const STATUS_LABELS: Record<ResourceStatus, string> = {
   available: 'Available',
-  limited: 'Limited slots',
   unavailable: 'Unavailable',
+  maintenance: 'Under Maintenance',
 }
 
 export function StatusBadge({ status }: { status?: ResourceStatus }) {
   if (!status) return null
   return (
-    <span
-      className={`text-sm font-medium px-2 py-0.5 rounded ${STATUS_STYLES[status]}`}
-    >
+    <span className={`text-sm font-medium px-2 py-0.5 rounded ${STATUS_STYLES[status]}`}>
       {STATUS_LABELS[status]}
     </span>
   )

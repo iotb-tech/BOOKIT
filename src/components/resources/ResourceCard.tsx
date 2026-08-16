@@ -1,4 +1,3 @@
-// components/resources/ResourceCard.tsx
 import Link from 'next/link'
 import { Resource } from '@/types/resource'
 import { StatusBadge } from './StatusBadge'
@@ -9,7 +8,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   return (
     <Link
       href={`/resources/${resource.id}`}
-      className="block border border-neutral-200 rounded-lg p-4 active:bg-neutral-50 md:hover:shadow-sm transition-shadow"
+      className="block bg-white border border-neutral-200 rounded-lg p-4 active:bg-neutral-50 md:hover:shadow-sm md:hover:border-neutral-300 transition-all"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
@@ -17,7 +16,9 @@ export function ResourceCard({ resource }: { resource: Resource }) {
             {initial}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{resource.name}</p>
+            <p className="text-sm font-medium text-neutral-900 truncate">
+              {resource.name}
+            </p>
             {resource.type && (
               <p className="text-sm text-neutral-600 truncate">{resource.type}</p>
             )}

@@ -4,7 +4,7 @@ interface ResourceEmptyProps {
 
 export function ResourceEmpty({ searchTerm }: ResourceEmptyProps) {
   return (
-    <div className="text-center py-12 border border-neutral-200 rounded-lg">
+    <div className="bg-white text-center py-12 border border-neutral-200 rounded-lg">
       <p className="text-base text-neutral-600">
         {searchTerm
           ? `No resources match "${searchTerm}".`

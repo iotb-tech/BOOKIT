@@ -1,13 +1,13 @@
 export type ResourceStatus =
   | "available"
-  | "limited"
-  | "unavailable";
+  | "unavailable"
+  | "maintenance";
 
 export interface Resource {
   id: string;
   name: string;
   description: string;
-  owner_id: string | null;
+  owner_id: string;
   owner_name?: string;
   type?: "Mentor" | "Study Group";
   skills?: string[];

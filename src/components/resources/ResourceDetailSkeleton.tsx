@@ -1,6 +1,6 @@
 export function ResourceDetailSkeleton() {
   return (
-    <div className="p-4 sm:p-6 flex flex-col gap-6 md:grid md:grid-cols-3 animate-pulse">
+    <div className="bg-white p-4 sm:p-6 flex flex-col gap-6 md:grid md:grid-cols-3 animate-pulse">
       <div className="md:col-span-2">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-neutral-200" />

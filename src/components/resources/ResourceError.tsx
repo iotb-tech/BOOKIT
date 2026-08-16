@@ -5,7 +5,7 @@ interface ResourceErrorProps {
 
 export function ResourceError({ onRetry, message }: ResourceErrorProps) {
   return (
-    <div className="text-center py-12 border border-neutral-200 rounded-lg">
+    <div className=" bg-white text-center py-12 border border-neutral-200 rounded-lg">
       <p className="text-base text-error">
         {message ?? "Couldn't load resources. Please try again."}
       </p>
