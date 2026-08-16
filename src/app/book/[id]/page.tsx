@@ -1,128 +1,63 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { bookingSchema } from "@/schemas/bookingSchema";
+import AvailableSlot from '@/components/booking/AvailableSlot';
+import BookingHeader from '@/components/booking/BookingHeader'
+import DateSelector from '@/components/booking/DateSelector'
+import EndTime from '@/components/booking/EndTime';
+import StartTime from '@/components/booking/StartTime';
+import Button from '@/components/ui/Button';
+import React, { useState } from 'react'
 
-export default function BookingPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [date, setDate] = useState("");
-  const [guests, setGuests] = useState(1);
 
-  const [message, setMessage] = useState("");
+function Page() {
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedStartTime, setSelectedStartTime] = useState("");
+  const [selectedEndTime, setSelectedEndTime] = useState("");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+const handleConfirmBooking = () => {
 
-    // Check the information entered by the user
-    const result = bookingSchema.safeParse({
-      name,
-      email,
-      date,
-      guests,
-    });
-
-    // If the information is not correct
-    if (!result.success) {
-      setMessage(result.error.issues[0].message);
-      return;
+    if(!selectedStartTime || !selectedEndTime || !selectedDate) {
+        alert('Please select a date, start time, and end time before confirming the booking.');
+    } else {
+        alert('Booking confirmed!');
     }
 
-    // If everything is correct
-    setMessage("Booking information is valid!");
+}
 
-    console.log("Booking:", result.data);
-  }
+const slots = [
+  {
+    startTime: "09:00 AM",
+    endTime: "10:00 AM",
+    available: true,
+  },
+  {
+    startTime: "10:00 AM",
+    endTime: "14:00 AM",
+    available: true,
+  },
+  {
+    startTime: "11:00 AM",
+    endTime: "12:00 PM",
+    available: false,
+  },
+  {
+    startTime: "12:00 PM",
+    endTime: "01:00 PM",
+    available: true,
+  },
+];
+
 
   return (
-    <main className="min-h-screen p-6">
-      <div className="mx-auto max-w-md">
-        <h1 className="mb-6 text-3xl font-bold">
-          Make a Booking
-        </h1>
+    <main className='text-white my-4 mx-auto border p-6 rounded-lg shadow-md max-w-md flex flex-col items-center justify-center gap-4'>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-lg border p-6"
-        >
-          {/* Name */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Enter your name"
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Email
-            </label>
-
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="Enter your email"
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Date */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Booking Date
-            </label>
-
-            <input
-              type="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Number of guests */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Number of Guests
-            </label>
-
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={guests}
-              onChange={(event) =>
-                setGuests(Number(event.target.value))
-              }
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Error or success message */}
-          {message && (
-            <p className="rounded bg-gray-100 p-3">
-              {message}
-            </p>
-          )}
-
-          {/* Submit button */}
-          <button
-            type="submit"
-            className="w-full rounded bg-black px-4 py-2 text-white"
-          >
-            Book Now
-          </button>
-        </form>
-      </div>
+    <BookingHeader />
+    <DateSelector value={selectedDate} onchange={setSelectedDate} />
+    <StartTime value={selectedStartTime} onchange={setSelectedStartTime} />
+    <EndTime value={selectedEndTime} onchange={setSelectedEndTime} />
+    <AvailableSlot slots={slots} selectedSlot={null} onSlotSelect={() => {}} />      
+      <Button label="Confirm Booking" variants='primary' onclick={handleConfirmBooking} />    
     </main>
-  );
+  )
 }
+export default Page
