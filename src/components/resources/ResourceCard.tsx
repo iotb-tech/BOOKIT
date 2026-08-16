@@ -4,7 +4,7 @@ import { Resource } from '@/types/resource'
 import { StatusBadge } from './StatusBadge'
 
 export function ResourceCard({ resource }: { resource: Resource }) {
-  const initial = (resource.owner_name ?? resource.name).charAt(0).toUpperCase()
+  const initial = (resource.owner_id ?? resource.name).charAt(0).toUpperCase()
 
   return (
     <Link
@@ -31,7 +31,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       </p>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-neutral-600">
-        {resource.owner_name && <span>with {resource.owner_name}</span>}
+        {resource.owner_id && <span>with {resource.owner_id}</span>}
         {resource.duration_minutes && <span>{resource.duration_minutes} min</span>}
       </div>
     </Link>

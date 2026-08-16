@@ -13,7 +13,7 @@ export function ResourceDetails({ id }: { id: string }) {
   if (isError || !resource) return <ResourceError onRetry={() => refetch()} />
 
   const isBookable = resource.status !== 'unavailable'
-  const initial = (resource.owner_name ?? resource.name).charAt(0).toUpperCase()
+  const initial = (resource.name ?? resource.name).charAt(0).toUpperCase()
 
   return (
     <div className="p-4 sm:p-6 flex flex-col gap-6 md:grid md:grid-cols-3">
@@ -30,8 +30,8 @@ export function ResourceDetails({ id }: { id: string }) {
             {resource.type && (
               <p className="text-sm text-neutral-600">{resource.type}</p>
             )}
-            {resource.owner_name && (
-              <p className="text-sm text-neutral-600">with {resource.owner_name}</p>
+            {resource.name && (
+              <p className="text-sm text-neutral-600">with {resource.owner_id}</p>
             )}
           </div>
         </div>
