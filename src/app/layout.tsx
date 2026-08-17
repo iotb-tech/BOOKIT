@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,19 +21,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full bg-blue-950 antialiased`}
-      title="BookIt - The Ultimate Booking Solution"
-
-      // theme-color="light dark"
-    >
-      <body className="min-h-full flex flex-col items-center justify-center">
-        <QueryProvider>
+    return (
+  <html
+    lang="en"
+    className={`${geistSans.variable} ${geistMono.variable} h-full bg-blue-950 antialiased`}
+    title="BookIt - The Ultimate Booking Solution"
+  >
+    <body className=" flex flex-col items-center justify-between">
+      <QueryProvider>
+        <Providers>
+          <Navbar />
           {children}
-        </QueryProvider>
-      </body>
-    </html>
-  );
+        </Providers>
+      </QueryProvider>
+    </body>
+  </html>
+)
+  ;
 }
