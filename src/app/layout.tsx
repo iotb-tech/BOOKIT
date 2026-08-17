@@ -21,18 +21,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-    return (
-  <html
-    lang="en"
-    className={`${geistSans.variable} ${geistMono.variable} h-full bg-blue-950 antialiased`}
-    title="BookIt - The Ultimate Booking Solution"
-  >
-    <body className=" flex flex-col items-center justify-between">
-      <QueryProvider>
-        <Providers>
-          <Navbar />
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full  antialiased`}
+      title="BookIt - The Ultimate Booking Solution"
+
+      // theme-color="light dark"
+    >
+      <body className="min-h-full flex flex-col items-center justify-center">
+        <QueryProvider>
           {children}
-        </Providers>
+        {/* <Providers/> */}
       </QueryProvider>
     </body>
   </html>
