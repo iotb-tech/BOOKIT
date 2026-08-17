@@ -1,7 +1,7 @@
 // components/resources/ResourceCard.tsx
 import Link from 'next/link'
 import { Resource } from '@/types/resource'
-import { StatusBadge } from './StatusBadge'
+import { StatusBadge } from './ResourceBadge'
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   const initial = (resource.owner_id ?? resource.name).charAt(0).toUpperCase()
@@ -31,7 +31,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       </p>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-neutral-600">
-        {resource.owner_id && <span>with {resource.owner_id}</span>}
+        {resource.owner_name && <span>with {resource.owner_name}</span>}
         {resource.duration_minutes && <span>{resource.duration_minutes} min</span>}
       </div>
     </Link>

@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full bg-blue-950 antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full  antialiased`}
       title="BookIt - The Ultimate Booking Solution"
 
       // theme-color="light dark"

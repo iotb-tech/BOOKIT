@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useResource } from '@/lib/resources/hooks'
 import { ResourceDetailSkeleton } from './ResourceDetailSkeleton'
 import { ResourceError } from './ResourceError'
-import { StatusBadge } from './StatusBadge'
+import { StatusBadge } from './ResourceBadge'
 
 export function ResourceDetails({ id }: { id: string }) {
   const { data: resource, isLoading, isError, refetch } = useResource(id)
