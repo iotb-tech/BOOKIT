@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ResourceList } from "@/components/resources/ResourceList";
+import { ResourceList } from "./ResourceList";
 
-export default function ResourcesPage() {
-  return (
+export default function ResourcesPage(){
+     return (
     <div>
       <div className="flex items-center justify-between px-4 pt-6 sm:px-6">
         <div />

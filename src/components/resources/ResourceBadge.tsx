@@ -3,13 +3,13 @@ import { ResourceStatus } from '@/types/resource'
 
 const STATUS_STYLES: Record<ResourceStatus, string> = {
   available: 'bg-success/10 text-success',
-  limited: 'bg-warning/10 text-warning',
+  maintenance: 'bg-warning/10 text-warning',
   unavailable: 'bg-error/10 text-error',
 }
 
 const STATUS_LABELS: Record<ResourceStatus, string> = {
   available: 'Available',
-  limited: 'Limited slots',
+  maintenance: 'Limited slots',
   unavailable: 'Unavailable',
 }
 

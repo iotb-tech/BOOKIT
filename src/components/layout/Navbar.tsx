@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { CalendarDays } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient();
@@ -34,7 +36,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="flex items-center justify-between p-4 border-b text-white bg-primary-600">
+    <nav className="flex items-center justify-between p-4 border-b text-white bg-primary-600 w-full">
       <Link href="/" className="flex items-center">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
             <CalendarDays size={24} />
@@ -57,6 +59,7 @@ export default function Navbar() {
                 const supabase = createClient();
                 await supabase.auth.signOut();
                 setUser(null);
+                router.push('/')
               }}
             >
               Logout
