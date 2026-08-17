@@ -44,7 +44,7 @@ export default function LoginForm() {
     }
 
     router.push(redirectTo);
-   router.refresh();
+    router.refresh();
   };
 
   return (
