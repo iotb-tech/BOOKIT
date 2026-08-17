@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 
@@ -27,10 +28,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
       // theme-color="light dark"
     >
-       <body className="min-h-full flex flex-col">
-  <Navbar />
-  {children}
-</body>
+      <body className="min-h-full flex flex-col items-center justify-center">
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+      </body>
     </html>
   );
 }
