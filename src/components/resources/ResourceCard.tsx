@@ -1,10 +1,10 @@
 // components/resources/ResourceCard.tsx
 import Link from 'next/link'
 import { Resource } from '@/types/resource'
-import { StatusBadge } from './StatusBadge'
+import { StatusBadge } from './ResourceBadge'
 
 export function ResourceCard({ resource }: { resource: Resource }) {
-  const initial = (resource.owner_name ?? resource.name).charAt(0).toUpperCase()
+  const initial = (resource.owner_id ?? resource.name).charAt(0).toUpperCase()
 
   return (
     <Link
