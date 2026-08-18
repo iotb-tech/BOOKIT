@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
       // theme-color="light dark"
     >
-      <body className="min-h-full flex flex-col items-center justify-center">
+      <body className="min-h-full mt-20">
         <QueryProvider>
           <Navbar/>
           {children}

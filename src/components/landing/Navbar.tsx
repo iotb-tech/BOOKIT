@@ -5,7 +5,7 @@ import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js";
+import { SupabaseClient, User } from "@supabase/supabase-js";
 import MobileMenu from "./MobileMenu";
 
 export default function Navbar() {
@@ -33,7 +33,7 @@ export default function Navbar() {
   },[])
   
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur-md">
+    <header className="fixed top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur-md ">
 
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
 
