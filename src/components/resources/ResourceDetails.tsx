@@ -1,20 +1,16 @@
 // components/resources/ResourceDetails.tsx
-'use client'
-import Link from 'next/link'
-import { useResource } from '@/lib/resources/hooks'
-import { ResourceDetailSkeleton } from './ResourceDetailSkeleton'
-import { ResourceError } from './ResourceError'
-import { StatusBadge } from './ResourceBadge'
-
+"use client";
+import Link from "next/link";
+import { useResource } from "@/hooks/useResource";
+import { ResourceDetailSkeleton } from "./ResourceDetailSkeleton";
+import { ResourceError } from "./ResourceError";
+import { StatusBadge } from "./ResourceBadge";
 export function ResourceDetails({ id }: { id: string }) {
-  const { data: resource, isLoading, isError, refetch } = useResource(id)
-
-  if (isLoading) return <ResourceDetailSkeleton />
-  if (isError || !resource) return <ResourceError onRetry={() => refetch()} />
-
-  const isBookable = resource.status !== 'unavailable'
-  const initial = (resource.name ?? resource.name).charAt(0).toUpperCase()
-
+  const { data: resource, isLoading, isError, refetch } = useResource(id);
+  if (isLoading) return <ResourceDetailSkeleton />;
+  if (isError || !resource) return <ResourceError onRetry={() => refetch()} />;
+  const isBookable = resource.status !== "unavailable";
+  const initial = resource.name.charAt(0).toUpperCase();
   return (
     <div className="p-4 sm:p-6 flex flex-col gap-6 md:grid md:grid-cols-3">
       {/* Info */}
@@ -30,14 +26,9 @@ export function ResourceDetails({ id }: { id: string }) {
             {resource.type && (
               <p className="text-sm text-neutral-600">{resource.type}</p>
             )}
-            {resource.name && (
-              <p className="text-sm text-neutral-600">with {resource.owner_id}</p>
-            )}
           </div>
         </div>
-
         <p className="text-base mt-4">{resource.description}</p>
-
         {resource.skills && resource.skills.length > 0 && (
           <div className="flex gap-2 mt-4 flex-wrap">
             {resource.skills.map((skill) => (
@@ -51,20 +42,17 @@ export function ResourceDetails({ id }: { id: string }) {
           </div>
         )}
       </div>
-
       {/* Booking panel */}
       <div className="border border-neutral-200 rounded-lg p-4 md:order-2 md:sticky md:top-6 md:h-fit">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium">Session details</p>
           <StatusBadge status={resource.status} />
         </div>
-
         {resource.duration_minutes && (
           <p className="text-sm text-neutral-600">
             Duration: {resource.duration_minutes} min
           </p>
         )}
-
         {isBookable ? (
           <Link
             href={`/book/${resource.id}`}
@@ -82,5 +70,5 @@ export function ResourceDetails({ id }: { id: string }) {
         )}
       </div>
     </div>
-  )
+  );
 }
