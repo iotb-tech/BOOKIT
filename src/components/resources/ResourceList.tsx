@@ -1,36 +1,37 @@
 // components/resources/ResourceList.tsx
-'use client'
-import { useState, useMemo } from 'react'
-import { useResources } from '@/lib/resources/hooks'
-import { ResourceCard } from './ResourceCard'
-import { ResourceListSkeleton } from './ResourceListSkeleton'
-import { ResourceError } from './ResourceError'
-import { ResourceEmpty } from './ResourceEmpty'
-import { ResourceStatus } from '@/types/resource'
+"use client";
+import { useState, useMemo } from "react";
+import { useResources } from "@/hooks/useResources";
+import { ResourceCard } from "./ResourceCard";
+import { ResourceListSkeleton } from "./ResourceListSkeleton";
+import { ResourceError } from "./ResourceError";
+import { ResourceEmpty } from "./ResourceEmpty";
+import { ResourceStatus } from "@/types/resource";
 
-const FILTERS: { label: string; value: ResourceStatus | 'all' }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Available', value: 'available' },
-  { label: 'Limited', value: 'limited' },
-  { label: 'Unavailable', value: 'unavailable' },
-]
+const FILTERS: { label: string; value: ResourceStatus | "all" }[] = [
+  { label: "All", value: "all" },
+  { label: "Available", value: "available" },
+  { label: "Maintenance", value: "maintenance" },
+  { label: "Unavailable", value: "unavailable" },
+];
 
 export function ResourceList() {
-  const { data, isLoading, isError, refetch } = useResources()
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<ResourceStatus | 'all'>('all')
+  const { data, isLoading, isError, refetch } = useResources();
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">(
+    "all",
+  );
 
   const filtered = useMemo(() => {
-    if (!data) return []
+    if (!data) return [];
     return data.filter((r) => {
       const matchesSearch =
         r.name.toLowerCase().includes(search.toLowerCase()) ||
-        (r.owner_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (r.type ?? '').toLowerCase().includes(search.toLowerCase())
-      const matchesStatus = statusFilter === 'all' || r.status === statusFilter
-      return matchesSearch && matchesStatus
-    })
-  }, [data, search, statusFilter])
+        (r.type ?? "").toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === "all" || r.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [data, search, statusFilter]);
 
   return (
     <div className="p-4 sm:p-6">
@@ -53,8 +54,8 @@ export function ResourceList() {
             onClick={() => setStatusFilter(f.value)}
             className={`text-sm px-3 py-1.5 rounded-full whitespace-nowrap border ${
               statusFilter === f.value
-                ? 'bg-primary-600 text-white border-primary-600'
-                : 'border-neutral-200 text-neutral-600'
+                ? "bg-primary-600 text-white border-primary-600"
+                : "border-neutral-200 text-neutral-600"
             }`}
           >
             {f.label}
@@ -77,5 +78,5 @@ export function ResourceList() {
         )}
       </div>
     </div>
-  )
+  );
 }

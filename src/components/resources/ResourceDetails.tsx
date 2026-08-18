@@ -1,19 +1,19 @@
 // components/resources/ResourceDetails.tsx
-'use client'
-import Link from 'next/link'
-import { useResource } from '@/lib/resources/hooks'
-import { ResourceDetailSkeleton } from './ResourceDetailSkeleton'
-import { ResourceError } from './ResourceError'
-import { StatusBadge } from './StatusBadge'
+"use client";
+import Link from "next/link";
+import { useResource } from "@/hooks/useResource";
+import { ResourceDetailSkeleton } from "./ResourceDetailSkeleton";
+import { ResourceError } from "./ResourceError";
+import { StatusBadge } from "./ResourceBadge";
 
 export function ResourceDetails({ id }: { id: string }) {
-  const { data: resource, isLoading, isError, refetch } = useResource(id)
+  const { data: resource, isLoading, isError, refetch } = useResource(id);
 
-  if (isLoading) return <ResourceDetailSkeleton />
-  if (isError || !resource) return <ResourceError onRetry={() => refetch()} />
+  if (isLoading) return <ResourceDetailSkeleton />;
+  if (isError || !resource) return <ResourceError onRetry={() => refetch()} />;
 
-  const isBookable = resource.status !== 'unavailable'
-  const initial = (resource.owner_name ?? resource.name).charAt(0).toUpperCase()
+  const isBookable = resource.status !== "unavailable";
+  const initial = resource.name.charAt(0).toUpperCase();
 
   return (
     <div className="p-4 sm:p-6 flex flex-col gap-6 md:grid md:grid-cols-3">
@@ -29,9 +29,6 @@ export function ResourceDetails({ id }: { id: string }) {
             </h1>
             {resource.type && (
               <p className="text-sm text-neutral-600">{resource.type}</p>
-            )}
-            {resource.owner_name && (
-              <p className="text-sm text-neutral-600">with {resource.owner_name}</p>
             )}
           </div>
         </div>
@@ -82,5 +79,5 @@ export function ResourceDetails({ id }: { id: string }) {
         )}
       </div>
     </div>
-  )
+  );
 }
