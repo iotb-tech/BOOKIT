@@ -1,10 +1,11 @@
 // app/resources/[id]/page.tsx
 import { ResourceDetails } from '@/components/resources/ResourceDetails'
 
-export default function ResourceDetailPage({
+export default async function ResourceDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  return <ResourceDetails id={params.id} />
+  const {id} = await params
+  return <ResourceDetails id={id} />
 }

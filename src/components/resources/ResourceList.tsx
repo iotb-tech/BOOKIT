@@ -50,7 +50,7 @@ export function ResourceList() {
       <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
         {FILTERS.map((f) => (
           <button
-            key={f.value}
+            key={f.label}
             onClick={() => setStatusFilter(f.value)}
             className={`text-sm px-3 py-1.5 rounded-full whitespace-nowrap border ${
               statusFilter === f.value

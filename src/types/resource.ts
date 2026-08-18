@@ -12,9 +12,10 @@ export interface Resource {
   name: string;
   description: string | null;
   owner_id: string;
+  owner_name?: string | null;
   created_at: string;
-  type: ResourceType | null;
-  skills: string[];
-  duration_minutes: number | null;
+  type?: ResourceType | null;
+  skills?: string[];
+  duration_minutes?: number | null;
   status: ResourceStatus;
 }

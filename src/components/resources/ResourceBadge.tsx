@@ -9,7 +9,7 @@ const STATUS_STYLES: Record<ResourceStatus, string> = {
 
 const STATUS_LABELS: Record<ResourceStatus, string> = {
   available: "Available",
-  maintenance: "Limited slots",
+  maintenance: "Maintenance",
   unavailable: "Unavailable",
 };
 
