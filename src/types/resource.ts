@@ -14,8 +14,11 @@ export interface Resource {
   owner_id: string;
   owner_name?: string | null;
   created_at: string;
+
   type?: ResourceType | null;
   skills?: string[];
   duration_minutes?: number | null;
   status: ResourceStatus;
+
+  next_available_at?: string | null;
 }
