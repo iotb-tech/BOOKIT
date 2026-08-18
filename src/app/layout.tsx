@@ -33,10 +33,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col items-center justify-center">
         <QueryProvider>
-          <Navbar />
+          <Navbar/>
           {children}
-        </QueryProvider>
-      </body>
-    </html>
-  );
+        {/* <Providers/> */}
+      </QueryProvider>
+    </body>
+  </html>
+)
+  ;
 }
