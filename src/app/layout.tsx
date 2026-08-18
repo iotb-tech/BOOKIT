@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import { Providers } from "./providers";
+import Navbar from "@/components/landing/Navbar";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+
+  
   return (
     <html
       lang="en"
@@ -31,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col items-center justify-center">
         <QueryProvider>
+          <Navbar/>
           {children}
         {/* <Providers/> */}
       </QueryProvider>

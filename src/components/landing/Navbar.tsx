@@ -1,9 +1,37 @@
+'use client'
+
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 import MobileMenu from "./MobileMenu";
 
 export default function Navbar() {
+
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+
+  useEffect(()=>{
+    const supabase = createClient()
+
+    const getUser = async () =>{
+      const {data: {user}} = await supabase.auth.getUser();
+      setUser(user)
+    };
+
+    getUser();
+
+    const {data:{subscription}}= supabase.auth.onAuthStateChange((_event,session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  },[])
+  
   return (
     <header className="fixed top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur-md">
 
@@ -58,12 +86,22 @@ export default function Navbar() {
 
         {/* Authentication */}
         <div className="flex items-center  justify-between gap-3">
-          <Link
+          {!user && <Link
             href="/login"
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-600 hover:text-indigo-600"
           >
             Log in
-          </Link>
+          </Link>}
+          {user && <button className="text-sm text-slate-700 px-4 py-2 border border-slate-300 rounded-lg hover:border-primary-500 hover:text-primary-500"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                setUser(null);
+                router.push('/login')
+              }}
+            >
+              Logout
+            </button>}
 
           <Link
             href="/signup"
