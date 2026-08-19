@@ -27,9 +27,11 @@ interface BookingCardProps {
   booking: BookingWithResource;
   onCancel?: (bookingId: string) => void;
   isCancelling?: boolean;
+  index?:number
+  cancellable?: boolean
 }
 
-export function BookingCard({ booking, onCancel, isCancelling }: BookingCardProps) {
+export default function BookingCard({ booking, index =0, onCancel, isCancelling , cancellable = true}: BookingCardProps) {
   const { date, time } = formatDateTime(booking.start_time, booking.end_time);
   const resourceName = booking.resource?.name ?? "Deleted resource";
   const initial = resourceName.charAt(0).toUpperCase();
