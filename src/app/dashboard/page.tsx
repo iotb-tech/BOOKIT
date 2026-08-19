@@ -31,24 +31,25 @@ function formatTime(iso: string) {
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
-  const bookings = await getBookingsForCurrentUser(
-    await createClient()
-  ).catch(() => []);
+  const bookings = await getBookingsForCurrentUser(await createClient()).catch(
+    () => [],
+  );
 
+  // eslint-disable-next-line react-hooks/purity -- Server Component executes once per request, not re-rendered
   const now = Date.now();
 
   const upcoming = bookings.filter(
     (booking) =>
       booking.status === "confirmed" &&
-      new Date(booking.end_time).getTime() >= now
+      new Date(booking.end_time).getTime() >= now,
   );
 
   const past = bookings.filter(
-    (booking) => new Date(booking.end_time).getTime() < now
+    (booking) => new Date(booking.end_time).getTime() < now,
   );
 
   const cancelled = bookings.filter(
-    (booking) => booking.status === "cancelled"
+    (booking) => booking.status === "cancelled",
   );
 
   const totalHours = bookings
@@ -59,10 +60,10 @@ export default async function DashboardPage() {
         Math.max(
           0,
           new Date(booking.end_time).getTime() -
-            new Date(booking.start_time).getTime()
+            new Date(booking.start_time).getTime(),
         ) /
           3_600_000,
-      0
+      0,
     );
 
   const fullName =
@@ -110,17 +111,13 @@ export default async function DashboardPage() {
     <AppShell>
       <main className="px-6 py-8 sm:px-8 lg:px-12 lg:py-10">
         <div className="mx-auto max-w-6xl">
-
           {/* Dashboard Header */}
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-700">
-                Dashboard
-              </p>
+              <p className="text-sm font-semibold text-slate-700">Dashboard</p>
 
               <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-800">
-                Welcome back, {firstName}!{" "}
-                <span aria-hidden="true">👋</span>
+                Welcome back, {firstName}! <span aria-hidden="true">👋</span>
               </h1>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -130,7 +127,6 @@ export default async function DashboardPage() {
 
             {/* Header Actions */}
             <div className="flex items-center gap-3">
-
               {/* Find a Session */}
               <Link
                 href="/resources"
@@ -154,44 +150,35 @@ export default async function DashboardPage() {
 
           {/* Summary Cards */}
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {stats.map(
-              ({
-                label,
-                value,
-                icon: Icon,
-                iconClass,
-              }) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_1px_6px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  {/* Card Heading */}
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-medium text-slate-500">
-                      {label}
-                    </p>
+            {stats.map(({ label, value, icon: Icon, iconClass }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_1px_6px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                {/* Card Heading */}
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-medium text-slate-500">{label}</p>
 
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconClass}`}
-                    >
-                      <Icon size={18} strokeWidth={2} />
-                    </span>
-                  </div>
-
-                  {/* Number */}
-                  <p className="mt-3 text-3xl font-semibold text-slate-800">
-                    {value}
-                  </p>
-
-                  <Link
-                    href="/my-bookings"
-                    className="mt-4 inline-block text-sm font-semibold text-primary-700 transition hover:text-primary-800"
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconClass}`}
                   >
-                    View all
-                  </Link>
+                    <Icon size={18} strokeWidth={2} />
+                  </span>
                 </div>
-              )
-            )}
+
+                {/* Number */}
+                <p className="mt-3 text-3xl font-semibold text-slate-800">
+                  {value}
+                </p>
+
+                <Link
+                  href="/my-bookings"
+                  className="mt-4 inline-block text-sm font-semibold text-primary-700 transition hover:text-primary-800"
+                >
+                  View all
+                </Link>
+              </div>
+            ))}
           </div>
 
           {/* Upcoming Bookings */}
@@ -249,15 +236,11 @@ export default async function DashboardPage() {
 
                       <div>
                         <p className="text-sm font-semibold text-slate-800">
-                          {booking.resource?.name ??
-                            "Mentorship Session"}
+                          {booking.resource?.name ?? "Mentorship Session"}
                         </p>
 
                         <p className="mt-1 text-sm text-slate-500">
-                          with{" "}
-                          {index % 2
-                            ? "Study Buddies"
-                            : "Jane Smith"}
+                          with {index % 2 ? "Study Buddies" : "Jane Smith"}
                         </p>
                       </div>
                     </div>
@@ -265,20 +248,13 @@ export default async function DashboardPage() {
                     {/* Date and Time */}
                     <div className="space-y-2 text-sm text-slate-500">
                       <p className="flex items-center gap-2">
-                        <CalendarDays
-                          size={15}
-                          className="text-slate-400"
-                        />
+                        <CalendarDays size={15} className="text-slate-400" />
 
                         {formatDate(booking.start_time)}
                       </p>
 
                       <p className="flex items-center gap-2">
-                        <Clock3
-                          size={15}
-                          className="text-slate-400"
-                        />
-
+                        <Clock3 size={15} className="text-slate-400" />
                         {formatTime(booking.start_time)} –{" "}
                         {formatTime(booking.end_time)}
                       </p>
