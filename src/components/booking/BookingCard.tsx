@@ -1,78 +1,206 @@
-import type { BookingWithResource } from "@/types/booking";
+"use client";
 
-function formatDateTime(startIso: string, endIso: string) {
-  const start = new Date(startIso);
-  const end = new Date(endIso);
+import {
+  CalendarDays,
+  Clock3,
+} from "lucide-react";
 
-  const date = start.toLocaleDateString(undefined, {
+import type { Booking } from "@/types/booking";
+import { useCancelBooking } from "@/hooks/useBookings";
+
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
-
-  const startTime = start.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  const endTime = end.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  return { date, time: `${startTime} - ${endTime}` };
+  }).format(new Date(iso));
 }
 
-interface BookingCardProps {
-  booking: BookingWithResource;
-  onCancel?: (bookingId: string) => void;
-  isCancelling?: boolean;
+function formatTime(iso: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(iso));
 }
 
-export function BookingCard({ booking, onCancel, isCancelling }: BookingCardProps) {
-  const { date, time } = formatDateTime(booking.start_time, booking.end_time);
-  const resourceName = booking.resource?.name ?? "Deleted resource";
-  const initial = resourceName.charAt(0).toUpperCase();
-  const isCancelled = booking.status === "cancelled";
+function isStudyGroup(
+  name?: string | null,
+  type?: string | null
+) {
+  const normalizedType = (type ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
 
   return (
-    <div className="flex items-center justify-between gap-3 border border-neutral-200 rounded-lg p-4">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 text-sm font-semibold flex items-center justify-center shrink-0">
-          {initial}
+    normalizedType === "study_group" ||
+    normalizedType === "studygroup" ||
+    (name ?? "").toLowerCase().includes("study group")
+  );
+}
+
+function getResourceInitials(
+  name?: string | null,
+  type?: string | null
+) {
+  const resourceName = name?.trim() || "Booked Session";
+
+  if (isStudyGroup(resourceName, type)) {
+    const teamMatch = resourceName.match(/Team\s+(\d+)/i);
+
+    if (teamMatch) {
+      return `T${teamMatch[1]}`;
+    }
+  }
+
+  return resourceName
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+export default function BookingCard({
+  booking,
+  index = 0,
+  cancellable = true,
+}: {
+  booking: Booking;
+  index?: number;
+  cancellable?: boolean;
+}) {
+  const cancel = useCancelBooking();
+
+  const resourceName =
+    booking.resource?.name ?? "Booked Session";
+
+  const resourceType =
+    booking.resource?.type;
+
+  const studyGroup = isStudyGroup(
+    resourceName,
+    resourceType
+  );
+
+  const initials = getResourceInitials(
+    resourceName,
+    resourceType
+  );
+
+  const isConfirmed =
+    booking.status === "confirmed";
+
+  const isCancelled =
+    booking.status === "cancelled";
+
+  const avatarStyle = studyGroup
+    ? index % 2
+      ? "bg-primary-100 text-primary-700"
+      : "bg-emerald-100 text-emerald-700"
+    : index % 2
+      ? "bg-blue-100 text-blue-700"
+      : "bg-amber-100 text-amber-700";
+
+  const statusLabel = isCancelled
+    ? "Cancelled"
+    : cancellable
+      ? "Confirmed"
+      : "Completed";
+
+  const statusClasses = isCancelled
+    ? "bg-rose-50 text-rose-700"
+    : cancellable
+      ? "bg-green-50 text-green-700"
+      : "bg-blue-50 text-blue-700";
+
+  const handleCancel = async () => {
+    const confirmed = window.confirm(
+      "Cancel this booking? The slot will become available again."
+    );
+
+    if (!confirmed) return;
+
+    const result = await cancel.mutateAsync(
+      booking.id
+    );
+
+    if (!result.success) {
+      window.alert(
+        result.error ||
+          "Unable to cancel this booking."
+      );
+    }
+  };
+
+  return (
+    <article className="grid items-center gap-5 border-b border-slate-100 py-5 last:border-b-0 sm:grid-cols-[1.4fr_1fr_auto_auto]">
+      {/* Resource */}
+      <div className="flex min-w-0 items-center gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${avatarStyle}`}
+        >
+          {initials}
         </div>
+
         <div className="min-w-0">
-          <p className="text-sm font-medium truncate">{resourceName}</p>
-          {booking.resource?.type && (
-            <p className="text-sm text-neutral-600 truncate">{booking.resource.type}</p>
-          )}
+          <p className="truncate text-sm font-semibold text-slate-800">
+            {resourceName}
+          </p>
+
+          <p className="mt-1 truncate text-sm text-slate-500">
+            {studyGroup
+              ? "Study group session"
+              : "Mentorship session"}
+          </p>
         </div>
       </div>
 
-      <div className="hidden sm:block text-sm text-neutral-600 text-right shrink-0">
-        <p>{date}</p>
-        <p>{time}</p>
+      {/* Date / Time */}
+      <div className="space-y-2 text-sm text-slate-500">
+        <p className="flex items-center gap-2">
+          <CalendarDays
+            size={15}
+            className="text-slate-400"
+          />
+
+          {formatDate(booking.start_time)}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <Clock3
+            size={15}
+            className="text-slate-400"
+          />
+
+          {formatTime(booking.start_time)} -{" "}
+          {formatTime(booking.end_time)}
+        </p>
       </div>
 
+      {/* Status */}
       <span
-        className={`text-sm px-2.5 py-1 rounded-full shrink-0 ${
-          isCancelled
-            ? "bg-neutral-100 text-neutral-600"
-            : "bg-green-50 text-success"
-        }`}
+        className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${statusClasses}`}
       >
-        {isCancelled ? "Cancelled" : "Confirmed"}
+        {statusLabel}
       </span>
 
-      {!isCancelled && onCancel && (
+      {/* Cancel */}
+      {cancellable && isConfirmed ? (
         <button
-          onClick={() => onCancel(booking.id)}
-          disabled={isCancelling}
-          className="text-sm px-3 py-1.5 rounded border border-neutral-200 text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 shrink-0"
+          type="button"
+          onClick={handleCancel}
+          disabled={cancel.isPending}
+          className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Cancel
+          {cancel.isPending
+            ? "Cancelling..."
+            : "Cancel"}
         </button>
+      ) : (
+        <span className="hidden sm:block" />
       )}
-    </div>
+    </article>
   );
 }
