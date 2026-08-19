@@ -8,3 +8,11 @@ export interface Booking {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type BookingStatus = "confirmed" | "cancelled";
+
+export type CreateBookingInput = {
+  resourceId: string;
+  startTime: string;
+  endTime: string;
+};

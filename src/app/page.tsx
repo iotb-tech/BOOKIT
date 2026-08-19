@@ -1,5 +1,33 @@
-import config from "../../postcss.config.mjs";
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
+import HowItWorks from "@/components/landing/HowItWorks";
+import ResourcesPreview from "@/components/landing/ResourcesPreview";
+import WhyBookIt from "@/components/landing/WhyBookIt";
+import CTA from "@/components/landing/CTA";
+import Footer from "@/components/landing/Footer";
+;
 
 export default function Home() {
-  return <div className="min-h-screen w-full flex items-center text-3xl bg-primary-50">This is the home page</div>;
+  return (
+    <>
+        <Navbar />
+
+      <main>
+        <Hero />
+
+        <Features />
+
+        <HowItWorks />
+
+        <ResourcesPreview />
+
+        <WhyBookIt />
+
+        <CTA />
+      </main>
+
+      <Footer />
+    </>
+  );
 }

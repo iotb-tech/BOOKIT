@@ -1,127 +1,51 @@
-"use client";
+import { notFound } from "next/navigation";
 
-import { useState } from "react";
-import { bookingSchema } from "@/schemas/bookingSchema";
+import BookingForm from "@/components/booking/BookingForm";
+import { createClient } from "@/lib/supabase/server";
 
-export default function BookingPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [date, setDate] = useState("");
-  const [guests, setGuests] = useState(1);
+type BookingPageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
-  const [message, setMessage] = useState("");
+export default async function BookingPage({
+  params,
+}: BookingPageProps) {
+  const { id } = await params;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const supabase = await createClient();
 
-    // Check the information entered by the user
-    const result = bookingSchema.safeParse({
-      name,
-      email,
-      date,
-      guests,
-    });
+  // Find the resource the user wants to book
+  const { data: resource, error } = await supabase
+    .from("resources")
+    .select("id, name, description")
+    .eq("id", id)
+    .maybeSingle();
 
-    // If the information is not correct
-    if (!result.success) {
-      setMessage(result.error.issues[0].message);
-      return;
-    }
-
-    // If everything is correct
-    setMessage("Booking information is valid!");
-
-    console.log("Booking:", result.data);
+  // Show Next.js 404 page if the resource does not exist
+  if (error || !resource) {
+    notFound();
   }
 
   return (
     <main className="min-h-screen p-6">
-      <div className="mx-auto max-w-md">
-        <h1 className="mb-6 text-3xl font-bold">
-          Make a Booking
-        </h1>
+      <div className="mx-auto max-w-2xl space-y-6">
+        {/* Resource information */}
+        <div>
+          <h1 className="text-3xl font-bold">
+            Book {resource.name}
+          </h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-lg border p-6"
-        >
-          {/* Name */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Enter your name"
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Email
-            </label>
-
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="Enter your email"
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Date */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Booking Date
-            </label>
-
-            <input
-              type="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Number of guests */}
-          <div>
-            <label className="mb-1 block font-medium">
-              Number of Guests
-            </label>
-
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={guests}
-              onChange={(event) =>
-                setGuests(Number(event.target.value))
-              }
-              className="w-full rounded border p-2"
-            />
-          </div>
-
-          {/* Error or success message */}
-          {message && (
-            <p className="rounded bg-gray-100 p-3">
-              {message}
+          {resource.description && (
+            <p className="mt-2 text-gray-600">
+              {resource.description}
             </p>
           )}
+        </div>
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            className="w-full rounded bg-black px-4 py-2 text-white"
-          >
-            Book Now
-          </button>
-        </form>
+        {/* Booking form */}
+        <BookingForm resourceId={resource.id} />
       </div>
     </main>
   );
