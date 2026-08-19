@@ -1,23 +1,36 @@
 import type { Metadata } from "next";
-import QueryProvider from "@/providers/QueryProvider";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ReactNode } from "react";
+import Navbar from "@/components/layout/Navbar";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: {
-    default: "BookIt",
-    template: "%s | BookIt",
-  },
-  description:
-    "Book mentors, join study groups, and manage learning sessions without scheduling conflicts.",
+  title: "BookIt",
+  description: "BookIt is the ultimate booking solution for your needs.",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body className="min-h-screen bg-white antialiased">
-        <QueryProvider>{children}</QueryProvider>
-      </body>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full bg-blue-950 antialiased`}
+      title="BookIt - The Ultimate Booking Solution"
+
+      // theme-color="light dark"
+    >
+       <body className="min-h-full flex flex-col">
+  <Navbar />
+  {children}
+</body>
     </html>
   );
 }

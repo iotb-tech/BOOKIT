@@ -1,32 +1,89 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { fetchMyBookings } from "@/lib/bookings";
+import {
+  cancelBooking,
+  createBooking,
+} from "@/lib/bookings/actions";
 import { createClient } from "@/lib/supabase/client";
-import { getMyBookings, cancelBooking } from "@/lib/bookings";
 
-const supabase = createClient();
+/* =========================================================
+   QUERY KEYS
+   ========================================================= */
 
-export function useBookings() {
+export const bookingKeys = {
+  all: ["bookings"] as const,
+  mine: () => [...bookingKeys.all, "mine"] as const,
+};
+
+/* =========================================================
+   GET MY BOOKINGS
+   ========================================================= */
+
+export function useMyBookings() {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: bookingKeys.mine(),
+
+    queryFn: () => fetchMyBookings(supabase),
+  });
+}
+
+/* =========================================================
+   CREATE BOOKING
+   ========================================================= */
+
+type CreateBookingInput = {
+  resourceId: string;
+  startTime: string;
+  endTime: string;
+};
+
+export function useCreateBooking() {
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["bookings"],
-    queryFn: async () => {
-      return getMyBookings(supabase);
+  return useMutation({
+    mutationFn: (input: CreateBookingInput) => {
+      return createBooking(input);
+    },
+
+    onSuccess: (result) => {
+      if (!result.success) {
+        return;
+      }
+
+      // Get fresh booking data after creating a booking
+      queryClient.invalidateQueries({
+        queryKey: bookingKeys.all,
+      });
     },
   });
+}
 
-  const cancel = useMutation({
-    mutationFn: (bookingId: string) => cancelBooking(supabase, bookingId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+/* =========================================================
+   CANCEL BOOKING
+   ========================================================= */
+
+export function useCancelBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (bookingId: string) => {
+      return cancelBooking(bookingId);
+    },
+
+    onSuccess: (result) => {
+      if (!result.success) {
+        return;
+      }
+
+      // Get fresh booking data after cancellation
+      queryClient.invalidateQueries({
+        queryKey: bookingKeys.all,
+      });
     },
   });
-
-  return {
-    ...query,
-    bookings: query.data ?? [],
-    cancelBooking: cancel.mutate,
-    isCancelling: cancel.isPending,
-  };
 }

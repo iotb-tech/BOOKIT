@@ -18,7 +18,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="overflow-hidden bg-white pt-35">
+    <section className="overflow-hidden bg-white pt-10">
 
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-2 pb-20 lg:grid-cols-2 lg:px-4">
 

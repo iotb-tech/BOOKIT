@@ -11,7 +11,8 @@ import Footer from "@/components/landing/Footer";
 export default function Home() {
   return (
     <>
-    <Navbar/>
+        <Navbar />
+
       <main>
         <Hero />
 
@@ -20,7 +21,6 @@ export default function Home() {
         <HowItWorks />
 
         <ResourcesPreview />
-        
 
         <WhyBookIt />
 

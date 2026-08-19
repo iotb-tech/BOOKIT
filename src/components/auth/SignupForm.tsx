@@ -218,6 +218,25 @@ export default function SignupForm() {
         <div className="h-px flex-1 bg-neutral-200" />
       </div>
 
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          disabled
+          title="Coming soon"
+          className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm text-neutral-400 cursor-not-allowed"
+        >
+          Google
+        </button>
+        <button
+          type="button"
+          disabled
+          title="Coming soon"
+          className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm text-neutral-400 cursor-not-allowed"
+        >
+          GitHub
+        </button>
+      </div>
+
       <p className="mt-6 text-center text-sm text-neutral-600">
         Already have an account?{" "}
         <a
