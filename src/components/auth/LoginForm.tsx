@@ -1,178 +1,278 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
+import {
+  loginSchema,
+  type LoginFormValues,
+} from "@/schemas/authSchema";
+
 import { login } from "@/lib/auth/actions";
-
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import SocialAuthButtons from "./SocialAuthButtons";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams =
+    useSearchParams();
+
+  const redirectTo =
+    searchParams.get(
+      "redirectTo"
+    ) || "/dashboard";
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
+
+  const [
+    serverError,
+    setServerError,
+  ] = useState<
+    string | null
+  >(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  });
+    formState: {
+      errors,
+      isSubmitting,
+    },
+  } =
+    useForm<LoginFormValues>(
+      {
+        resolver:
+          zodResolver(
+            loginSchema
+          ),
 
-  const onSubmit = async (values: LoginFormValues) => {
+        defaultValues: {
+          email: "",
+          password: "",
+        },
+      }
+    );
+
+  const onSubmit = async (
+    values: LoginFormValues
+  ) => {
     setServerError(null);
-    setIsSubmitting(true);
 
-    const result = await login(values.email, values.password);
-
-    setIsSubmitting(false);
+    const result =
+      await login(
+        values.email,
+        values.password
+      );
 
     if (!result.success) {
-      setServerError(result.error ?? "Something went wrong. Please try again.");
+      setServerError(
+        result.error ??
+          "Unable to log in. Please try again."
+      );
+
       return;
     }
 
-    router.push("/dashboard");
+    router.replace(
+      redirectTo
+    );
+
+    router.refresh();
   };
 
   return (
-    <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-sm">
-      <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold text-neutral-900">Welcome Back 👋</h1>
-        <p className="mt-1 text-sm text-neutral-600">Log in to your account</p>
+    <div className="w-full rounded-2xl border border-slate-200 bg-white p-7 shadow-[0_8px_30px_rgba(15,23,42,0.06)] sm:p-8">
+
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+          Welcome Back 👋
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-500">
+          Log in to your
+          BookIt account
+        </p>
       </div>
 
+      {/* Server Error */}
       {serverError && (
         <div
           role="alert"
-          className="mb-4 rounded-lg border border-error/20 bg-red-50 px-4 py-3 text-sm text-error"
+          className="mt-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600"
         >
           {serverError}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit(
+          onSubmit
+        )}
+        noValidate
+        className="mt-7 space-y-5"
+      >
+
+        {/* Email */}
         <div>
           <label
             htmlFor="email"
-            className="mb-1 block text-sm font-medium text-neutral-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Email
           </label>
+
           <input
             id="email"
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            className={`w-full rounded-lg border px-3 py-2 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-              errors.email ? "border-error" : "border-neutral-200"
-            }`}
-            {...register("email")}
+            aria-invalid={Boolean(
+              errors.email
+            )}
+            className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+            {...register(
+              "email"
+            )}
           />
+
           {errors.email && (
-            <p id="email-error" className="mt-1 text-sm text-error">
-              {errors.email.message}
+            <p className="mt-1.5 text-xs font-medium text-red-500">
+              {
+                errors.email
+                  .message
+              }
             </p>
           )}
         </div>
 
+        {/* Password */}
         <div>
-          <div className="mb-1 flex items-center justify-between">
+          <div className="mb-2 flex items-center justify-between gap-3">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-neutral-800"
+              className="text-sm font-semibold text-slate-700"
             >
               Password
             </label>
-            <a
-              href="/forgot-password"
-              className="text-sm text-primary-600 hover:underline"
+
+            <button
+              type="button"
+              className="text-xs font-semibold text-primary-700 transition hover:text-primary-800"
             >
               Forgot password?
-            </a>
+            </button>
           </div>
+
           <div className="relative">
             <input
               id="password"
-              type={showPassword ? "text" : "password"}
+              type={
+                showPassword
+                  ? "text"
+                  : "password"
+              }
               autoComplete="current-password"
               placeholder="••••••••"
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error" : undefined}
-              className={`w-full rounded-lg border px-3 py-2 pr-10 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                errors.password ? "border-error" : "border-neutral-200"
-              }`}
-              {...register("password")}
+              aria-invalid={Boolean(
+                errors.password
+              )}
+              className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 pr-11 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+              {...register(
+                "password"
+              )}
             />
+
             <button
               type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-sm text-neutral-400 hover:text-neutral-600"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              onClick={() =>
+                setShowPassword(
+                  (
+                    value
+                  ) => !value
+                )
+              }
+              className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-slate-400 transition hover:text-slate-700"
+              aria-label={
+                showPassword
+                  ? "Hide password"
+                  : "Show password"
+              }
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? (
+                <EyeOff
+                  size={17}
+                />
+              ) : (
+                <Eye
+                  size={17}
+                />
+              )}
             </button>
           </div>
+
           {errors.password && (
-            <p id="password-error" className="mt-1 text-sm text-error">
-              {errors.password.message}
+            <p className="mt-1.5 text-xs font-medium text-red-500">
+              {
+                errors
+                  .password
+                  .message
+              }
             </p>
           )}
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-lg bg-primary-600 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={
+            isSubmitting
+          }
+          className="flex h-11 w-full items-center justify-center rounded-lg bg-primary-600 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:cursor-wait disabled:opacity-60"
         >
-          {isSubmitting ? "Logging in…" : "Log In"}
+          {isSubmitting
+            ? "Logging in..."
+            : "Log In"}
         </button>
       </form>
 
-      <div className="my-5 flex items-center gap-3">
-        <div className="h-px flex-1 bg-neutral-200" />
-        <span className="text-xs text-neutral-400">or continue with</span>
-        <div className="h-px flex-1 bg-neutral-200" />
+      {/* Divider */}
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-200" />
+
+        <span className="whitespace-nowrap text-xs text-slate-400">
+          or continue with
+        </span>
+
+        <div className="h-px flex-1 bg-slate-200" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          disabled
-          title="Coming soon"
-          className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm text-neutral-400 cursor-not-allowed"
-        >
-          Google
-        </button>
-        <button
-          type="button"
-          disabled
-          title="Coming soon"
-          className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm text-neutral-400 cursor-not-allowed"
-        >
-          GitHub
-        </button>
-      </div>
+      {/* Social Auth */}
+      <SocialAuthButtons />
 
-      <p className="mt-6 text-center text-sm text-neutral-600">
-        Don&apos;t have an account?{" "}
-        <a
+      {/* Signup */}
+      <p className="mt-6 text-center text-sm text-slate-500">
+        Don&apos;t have an
+        account?{" "}
+        <Link
           href="/signup"
-          className="font-medium text-primary-600 hover:underline"
+          className="font-semibold text-primary-700 transition hover:text-primary-800 hover:underline"
         >
           Sign up
-        </a>
+        </Link>
       </p>
     </div>
   );

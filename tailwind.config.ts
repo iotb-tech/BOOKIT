@@ -1,38 +1,44 @@
-import type {Config} from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   theme: {
     extend: {
       colors: {
         primary: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          300: "#93c5fd",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
+          50: "#f6f3ff",
+          100: "#eee8ff",
+          200: "#ddd0ff",
+          300: "#c3adff",
+          400: "#9c7cff",
+          500: "#7b4fe9",
+          600: "#6334d8",
+          700: "#5127b8",
+          800: "#452398",
+          900: "#3a207d",
         },
         neutral: {
           50: "#fafafa",
-          100: "#f4f4f5",
-          200: "#e4e4e7",
-          400: "#a1a1aa",
-          600: "#52525b",
-          800: "#27272a",
-          900: "#18181b",
+          100: "#f5f5f5",
+          200: "#e8e8ec",
+          300: "#d6d6dc",
+          400: "#9a9aa4",
+          500: "#73737d",
+          600: "#565660",
+          700: "#3d3d46",
+          800: "#292930",
+          900: "#18181d",
         },
-        success: "#16a34a",
-        warning: "#d97706",
-        error: "#dc2626",
+        success: "#23955a",
+        warning: "#c57b1b",
+        error: "#c94040",
       },
-
-      fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+      boxShadow: {
+        soft: "0 12px 35px rgba(33, 25, 61, 0.08)",
+        card: "0 4px 18px rgba(26, 22, 42, 0.06)",
       },
-
       borderRadius: {
-        DEFAULT: "0.5rem",
-        lg: "0.75rem",
+        xl: "0.85rem",
+        "2xl": "1.15rem",
       },
     },
   },
