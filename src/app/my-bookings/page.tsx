@@ -4,7 +4,7 @@ import { useBookings } from "@/hooks/useBookings";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Search, CalendarCheck2 } from "lucide-react";
-import BookingCard from "@/components/booking/BookingCard";
+import { BookingCard } from "@/components/booking/BookingCard";
 // import PageBadge from '@/components/ui/PageBadge'
 function MyBookingsContent() {
   const { data: bookings = [], isLoading, isError, refetch } = useBookings();
