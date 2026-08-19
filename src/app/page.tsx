@@ -6,24 +6,18 @@ import ResourcesPreview from "@/components/landing/ResourcesPreview";
 import WhyBookIt from "@/components/landing/WhyBookIt";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
-;
 
 export default function Home() {
   return (
     <>
-        <Navbar />
+      <Navbar />
 
-      <main>
+      <main className="pt-20">
         <Hero />
-
         <Features />
-
         <HowItWorks />
-
         <ResourcesPreview />
-
         <WhyBookIt />
-
         <CTA />
       </main>
 

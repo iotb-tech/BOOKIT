@@ -1,9 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-// import { DataBase } from "@/types/database";
 import { env } from "../env";
 
-const PUBLIC_EXACT_PATHS = ["/login", "/signup", "/auth"];
+const PUBLIC_EXACT_PATHS = ["/", "/login", "/signup"];
 const PUBLIC_PREFIXES = ["/auth"];
 
 function isPublicPath(pathname: string) {
