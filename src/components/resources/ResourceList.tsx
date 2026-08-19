@@ -1,14 +1,8 @@
+
 "use client";
 
-import {
-  useMemo,
-  useState,
-} from "react";
-
-import {
-  Search,
-  SlidersHorizontal,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 import { useResources } from "@/hooks/useResources";
 import { ResourceCard } from "./ResourceCard";
@@ -30,20 +24,15 @@ function normalizeResourceType(
   type?: string | null,
   name?: string | null
 ): ResourceType {
-  const normalized =
-    (type ?? "")
-      .trim()
-      .toLowerCase()
-      .replace(/[\s-]+/g, "_");
+  const normalized = (type ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
 
   if (
-    normalized ===
-      "study_group" ||
-    normalized ===
-      "studygroup" ||
-    (name ?? "")
-      .toLowerCase()
-      .includes("study group")
+    normalized === "study_group" ||
+    normalized === "studygroup" ||
+    (name ?? "").toLowerCase().includes("study group")
   ) {
     return "Study Group";
   }
@@ -63,88 +52,76 @@ export function ResourceList() {
     refetch,
   } = useResources();
 
-  const [search, setSearch] =
-    useState("");
+  const [search, setSearch] = useState("");
 
-  const [
-    showFilters,
-    setShowFilters,
-  ] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const [status, setStatus] =
-    useState<
-      ResourceStatus | "all"
-    >("all");
+  const [status, setStatus] = useState<
+    ResourceStatus | "all"
+  >("all");
 
-  const [type, setType] =
-    useState<
-      ResourceType | "all"
-    >("all");
+  const [type, setType] = useState<
+    ResourceType | "all"
+  >("all");
 
-  const filtered =
-    useMemo(() => {
-      const query = search
-        .trim()
+  /* =========================================================
+     FILTER RESOURCES
+  ========================================================= */
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return resources.filter((resource) => {
+      const resourceType = normalizeResourceType(
+        resource.type,
+        resource.name
+      );
+
+      const searchableText = [
+        resource.name,
+        resource.description ?? "",
+        resource.owner_name ?? "",
+        resourceType,
+        ...(resource.skills ?? []),
+      ]
+        .join(" ")
         .toLowerCase();
 
-      return resources.filter(
-        (resource) => {
-          const resourceType =
-            normalizeResourceType(
-              resource.type,
-              resource.name
-            );
+      const matchesSearch =
+        !query || searchableText.includes(query);
 
-          const searchableText = [
-            resource.name,
-            resource.description ??
-              "",
-            resource.owner_name ??
-              "",
-            resourceType,
-            ...(resource.skills ??
-              []),
-          ]
-            .join(" ")
-            .toLowerCase();
+      const matchesType =
+        type === "all" || resourceType === type;
 
-          const matchesSearch =
-            !query ||
-            searchableText.includes(
-              query
-            );
+      const matchesStatus =
+        status === "all" ||
+        resource.status === status;
 
-          const matchesType =
-            type === "all" ||
-            resourceType === type;
-
-          const matchesStatus =
-            status === "all" ||
-            resource.status ===
-              status;
-
-          return (
-            matchesSearch &&
-            matchesType &&
-            matchesStatus
-          );
-        }
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesStatus
       );
-    }, [
-      resources,
-      search,
-      status,
-      type,
-    ]);
+    });
+  }, [resources, search, status, type]);
+
+  /* =========================================================
+     CLEAR FILTERS
+  ========================================================= */
+
+  const clearFilters = () => {
+    setSearch("");
+    setType("all");
+    setStatus("all");
+  };
 
   return (
-    <div>
-      {/* =========================================
+    <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      {/* =====================================================
           SEARCH / FILTER
-      ========================================= */}
+      ===================================================== */}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-
+      <div className="mt-2 flex flex-col gap-3 sm:flex-row">
         {/* Search */}
         <label className="relative flex-1">
           <span className="sr-only">
@@ -160,9 +137,7 @@ export function ResourceList() {
             type="search"
             value={search}
             onChange={(event) =>
-              setSearch(
-                event.target.value
-              )
+              setSearch(event.target.value)
             }
             placeholder="Search resources, mentors, or study groups..."
             className="h-12 w-full rounded-lg border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
@@ -173,38 +148,29 @@ export function ResourceList() {
         <button
           type="button"
           onClick={() =>
-            setShowFilters(
-              (current) =>
-                !current
-            )
+            setShowFilters((current) => !current)
           }
-          aria-expanded={
-            showFilters
-          }
+          aria-expanded={showFilters}
           className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-medium text-slate-600 transition hover:border-primary-300 hover:bg-primary-50/40 hover:text-primary-700"
         >
-          <SlidersHorizontal
-            size={17}
-          />
+          <SlidersHorizontal size={17} />
           Filter
         </button>
       </div>
 
-      {/* =========================================
+      {/* =====================================================
           FILTER OPTIONS
-      ========================================= */}
+      ===================================================== */}
 
       {showFilters && (
         <div className="mt-3 flex flex-wrap gap-3 rounded-xl border border-slate-200 bg-white p-4">
-
           {/* Type */}
           <select
             value={type}
             aria-label="Filter by resource type"
             onChange={(event) =>
               setType(
-                event.target
-                  .value as
+                event.target.value as
                   | ResourceType
                   | "all"
               )
@@ -230,8 +196,7 @@ export function ResourceList() {
             aria-label="Filter by availability"
             onChange={(event) =>
               setStatus(
-                event.target
-                  .value as
+                event.target.value as
                   | ResourceStatus
                   | "all"
               )
@@ -255,17 +220,13 @@ export function ResourceList() {
             </option>
           </select>
 
-          {/* Clear */}
+          {/* Clear Filters */}
           {(type !== "all" ||
             status !== "all" ||
             search) && (
             <button
               type="button"
-              onClick={() => {
-                setSearch("");
-                setType("all");
-                setStatus("all");
-              }}
+              onClick={clearFilters}
               className="text-sm font-medium text-primary-700 transition hover:text-primary-800"
             >
               Clear filters
@@ -274,31 +235,32 @@ export function ResourceList() {
         </div>
       )}
 
-      {/* =========================================
+      {/* =====================================================
           PAGE HEADING
-      ========================================= */}
+      ===================================================== */}
 
-      <div className="mt-8">
+      <div className="mt-10">
         <PageBadge label="Resources" />
 
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-white ">
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Find the right resource
         </h1>
 
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Discover mentors and study groups and book a time that works for you.
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+          Discover mentors and study groups and book a
+          time that works for you.
         </p>
       </div>
 
-      {/* =========================================
+      {/* =====================================================
           RESULT COUNT
-      ========================================= */}
+      ===================================================== */}
 
       {!isLoading &&
         !isError &&
         resources.length > 0 && (
           <div className="mt-6 flex items-center justify-between">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               {filtered.length}{" "}
               {filtered.length === 1
                 ? "resource"
@@ -308,12 +270,11 @@ export function ResourceList() {
           </div>
         )}
 
-      {/* =========================================
+      {/* =====================================================
           RESULTS
-      ========================================= */}
+      ===================================================== */}
 
       <div className="mt-5">
-
         {/* Loading */}
         {isLoading && (
           <ResourceListSkeleton />
@@ -322,21 +283,16 @@ export function ResourceList() {
         {/* Error */}
         {isError && (
           <ResourceError
-            onRetry={() =>
-              refetch()
-            }
+            onRetry={() => refetch()}
           />
         )}
 
         {/* Empty */}
         {!isLoading &&
           !isError &&
-          filtered.length ===
-            0 && (
+          filtered.length === 0 && (
             <ResourceEmpty
-              searchTerm={
-                search
-              }
+              searchTerm={search}
             />
           )}
 
@@ -346,20 +302,11 @@ export function ResourceList() {
           filtered.length > 0 && (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map(
-                (
-                  resource,
-                  index
-                ) => (
+                (resource, index) => (
                   <ResourceCard
-                    key={
-                      resource.id
-                    }
-                    resource={
-                      resource
-                    }
-                    index={
-                      index
-                    }
+                    key={resource.id}
+                    resource={resource}
+                    index={index}
                   />
                 )
               )}

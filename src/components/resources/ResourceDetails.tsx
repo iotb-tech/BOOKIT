@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -10,10 +11,14 @@ import {
 } from "lucide-react";
 
 import { useResource } from "@/hooks/useResource";
-import { useResourceAvailability } from "@/hooks/useResourceAvailability"
+import { useResourceAvailability } from "@/hooks/useResourceAvailability";
 
 import { ResourceDetailSkeleton } from "./ResourceDetailSkeleton";
 import { ResourceError } from "./ResourceError";
+
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function isStudyGroup(
   name?: string | null,
@@ -27,7 +32,9 @@ function isStudyGroup(
   return (
     normalizedType === "study_group" ||
     normalizedType === "studygroup" ||
-    (name ?? "").toLowerCase().includes("study group")
+    (name ?? "")
+      .toLowerCase()
+      .includes("study group")
   );
 }
 
@@ -72,6 +79,10 @@ function formatSlotTime(iso: string) {
   }).format(new Date(iso));
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export function ResourceDetails({
   id,
 }: {
@@ -91,18 +102,28 @@ export function ResourceDetails({
     refetch: refetchAvailability,
   } = useResourceAvailability(id);
 
+  /* =========================================================
+     LOADING / ERROR
+  ========================================================= */
+
   if (isLoading) {
     return <ResourceDetailSkeleton />;
   }
 
   if (isError || !resource) {
     return (
-      <ResourceError
-        onRetry={() => refetch()}
-        message="This resource could not be loaded."
-      />
+      <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <ResourceError
+          onRetry={() => refetch()}
+          message="This resource could not be loaded."
+        />
+      </div>
     );
   }
+
+  /* =========================================================
+     RESOURCE DATA
+  ========================================================= */
 
   const studyGroup = isStudyGroup(
     resource.name,
@@ -135,19 +156,33 @@ export function ResourceDetails({
             "Technical Guidance",
           ];
 
+  /* =========================================================
+     RENDER
+  ========================================================= */
+
   return (
-    <div>
-      {/* Back */}
+    <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      {/* =====================================================
+          BACK LINK
+      ===================================================== */}
+
       <Link
         href="/resources"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-primary-700"
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-primary-400"
       >
         <ArrowLeft size={16} />
         Back to Resources
       </Link>
 
-      <section className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.03)]">
-        {/* Main information */}
+      {/* =====================================================
+          MAIN CARD
+      ===================================================== */}
+
+      <section className="mt-6 overflow-hidden rounded-xl border border-slate-700/60 bg-slate-900/80 shadow-[0_2px_12px_rgba(0,0,0,0.15)]">
+        {/* ===================================================
+            MAIN INFORMATION
+        =================================================== */}
+
         <div className="grid md:grid-cols-[1.45fr_1fr]">
           {/* Left */}
           <div className="p-6 md:p-8">
@@ -158,41 +193,41 @@ export function ResourceDetails({
               </div>
 
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-800">
+                <h1 className="text-3xl font-bold tracking-tight text-white">
                   {displayName}
                 </h1>
 
-                <p className="mt-1 text-sm font-medium text-primary-700">
+                <p className="mt-1 text-sm font-medium text-primary-400">
                   {type}
                 </p>
 
                 {/* Rating */}
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
+                <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-400">
                   <Star
                     size={15}
                     className="fill-amber-400 text-amber-400"
                   />
 
-                  <span className="font-semibold text-slate-700">
+                  <span className="font-semibold text-slate-200">
                     5.0
                   </span>
 
                   <span>(24 reviews)</span>
                 </div>
 
-                <p className="mt-4 max-w-md text-sm leading-6 text-slate-600">
+                <p className="mt-4 max-w-md text-sm leading-6 text-slate-400">
                   {resource.description ||
                     "Practical guidance focused on learning, collaboration and real-world projects."}
                 </p>
               </div>
             </div>
 
-            {/* Session information */}
-            <div className="mt-7 space-y-3 text-sm text-slate-600">
+            {/* Session Information */}
+            <div className="mt-7 space-y-3 text-sm text-slate-400">
               <p className="flex items-center gap-2">
                 <Clock3
                   size={16}
-                  className="text-slate-400"
+                  className="text-slate-500"
                 />
 
                 {studyGroup
@@ -207,7 +242,7 @@ export function ResourceDetails({
               <p className="flex items-center gap-2">
                 <MessageCircle
                   size={16}
-                  className="text-slate-400"
+                  className="text-slate-500"
                 />
 
                 {studyGroup
@@ -218,17 +253,17 @@ export function ResourceDetails({
           </div>
 
           {/* Right / About */}
-          <div className="border-t border-slate-200 p-6 md:border-l md:border-t-0 md:p-8">
-            <h2 className="text-base font-semibold text-slate-800">
+          <div className="border-t border-slate-700/60 p-6 md:border-l md:border-t-0 md:p-8">
+            <h2 className="text-base font-semibold text-white">
               About
             </h2>
 
-            <p className="mt-3 text-sm leading-6 text-slate-600">
+            <p className="mt-3 text-sm leading-6 text-slate-400">
               {resource.description ||
                 "Learn, collaborate and build practical skills through BookIt."}
             </p>
 
-            <h3 className="mt-7 text-sm font-semibold text-slate-800">
+            <h3 className="mt-7 text-sm font-semibold text-white">
               Skills
             </h3>
 
@@ -236,7 +271,7 @@ export function ResourceDetails({
               {skills.map((skill) => (
                 <span
                   key={skill}
-                  className="rounded-md border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"
+                  className="rounded-md border border-primary-500/20 bg-primary-500/10 px-3 py-1.5 text-xs font-semibold text-primary-400"
                 >
                   {skill}
                 </span>
@@ -245,11 +280,14 @@ export function ResourceDetails({
           </div>
         </div>
 
-        {/* Availability */}
-        <div className="border-t border-slate-200 p-5 sm:p-6">
+        {/* ===================================================
+            AVAILABILITY
+        =================================================== */}
+
+        <div className="border-t border-slate-700/60 p-5 sm:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-semibold text-slate-800">
+              <h2 className="text-base font-semibold text-white">
                 {studyGroup
                   ? "Upcoming Sessions"
                   : "Next Available Slots"}
@@ -258,19 +296,19 @@ export function ResourceDetails({
               {/* Loading */}
               {availabilityLoading ? (
                 <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-                  {Array.from({
-                    length: 3,
-                  }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-[105px] animate-pulse rounded-lg border border-slate-200 bg-slate-50"
-                    />
-                  ))}
+                  {Array.from({ length: 3 }).map(
+                    (_, index) => (
+                      <div
+                        key={index}
+                        className="h-[105px] animate-pulse rounded-lg border border-slate-700 bg-slate-800/60"
+                      />
+                    )
+                  )}
                 </div>
               ) : availabilityError ? (
                 /* Error */
-                <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-5 py-5">
-                  <p className="text-sm font-medium text-red-700">
+                <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-5 py-5">
+                  <p className="text-sm font-medium text-red-400">
                     Availability could not be loaded.
                   </p>
 
@@ -279,15 +317,15 @@ export function ResourceDetails({
                     onClick={() =>
                       refetchAvailability()
                     }
-                    className="mt-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
+                    className="mt-2 text-sm font-semibold text-primary-400 hover:text-primary-300"
                   >
                     Try again
                   </button>
                 </div>
               ) : availability.length === 0 ? (
                 /* Empty */
-                <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-5 py-6">
-                  <p className="text-sm font-medium text-slate-700">
+                <div className="mt-4 rounded-lg border border-dashed border-slate-700 px-5 py-6">
+                  <p className="text-sm font-medium text-slate-300">
                     {studyGroup
                       ? "No upcoming sessions."
                       : "No upcoming availability."}
@@ -306,27 +344,27 @@ export function ResourceDetails({
                       <Link
                         key={slot.id}
                         href={`/book/${resource.id}?slot=${slot.id}`}
-                        className="rounded-lg border border-slate-200 px-4 py-4 text-center transition hover:border-primary-300 hover:bg-primary-50"
+                        className="rounded-lg border border-slate-700 px-4 py-4 text-center transition hover:border-primary-500/50 hover:bg-primary-500/10"
                       >
-                        <p className="text-sm font-semibold text-slate-700">
+                        <p className="text-sm font-semibold text-slate-200">
                           {formatSlotDay(
                             slot.start_time
                           )}
                         </p>
 
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-slate-400">
                           {formatSlotDate(
                             slot.start_time
                           )}
                         </p>
 
-                        <p className="mt-2 text-sm font-semibold text-primary-700">
+                        <p className="mt-2 text-sm font-semibold text-primary-400">
                           {formatSlotTime(
                             slot.start_time
                           )}
                         </p>
 
-                        <p className="mt-1 text-xs text-slate-400">
+                        <p className="mt-1 text-xs text-slate-500">
                           to{" "}
                           {formatSlotTime(
                             slot.end_time
