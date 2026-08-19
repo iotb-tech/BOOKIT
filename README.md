@@ -85,6 +85,7 @@ npm run build
 
 Before demo day, test at minimum:
 
+
 - Signup/login/logout and session persistence
 - Google login/signup and GitHub login/signup
 - Protected-route redirects
