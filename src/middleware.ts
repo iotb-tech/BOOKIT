@@ -4,7 +4,6 @@ import { updateSession } from './lib/supabase/middleware'
 export async function middleware(
   request: NextRequest
 ) {
-  // Run Supabase session handling and route protection.
   return await updateSession(request)
 }
 

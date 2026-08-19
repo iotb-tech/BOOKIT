@@ -1,63 +1,52 @@
-"use client"
+import { notFound } from "next/navigation";
 
-import AvailableSlot from '@/components/booking/AvailableSlot';
-import BookingHeader from '@/components/booking/BookingHeader'
-import DateSelector from '@/components/booking/DateSelector'
-import EndTime from '@/components/booking/EndTime';
-import StartTime from '@/components/booking/StartTime';
-import Button from '@/components/ui/Button';
-import React, { useState } from 'react'
+import BookingForm from "@/components/booking/BookingForm";
+import { createClient } from "@/lib/supabase/server";
 
+type BookingPageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
-function Page() {
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedStartTime, setSelectedStartTime] = useState("");
-  const [selectedEndTime, setSelectedEndTime] = useState("");
+export default async function BookingPage({
+  params,
+}: BookingPageProps) {
+  const { id } = await params;
 
-const handleConfirmBooking = () => {
+  const supabase = await createClient();
 
-    if(!selectedStartTime || !selectedEndTime || !selectedDate) {
-        alert('Please select a date, start time, and end time before confirming the booking.');
-    } else {
-        alert('Booking confirmed!');
-    }
+  // Find the resource the user wants to book
+  const { data: resource, error } = await supabase
+    .from("resources")
+    .select("id, name, description")
+    .eq("id", id)
+    .maybeSingle();
 
-}
-
-const slots = [
-  {
-    startTime: "09:00 AM",
-    endTime: "10:00 AM",
-    available: true,
-  },
-  {
-    startTime: "10:00 AM",
-    endTime: "14:00 AM",
-    available: true,
-  },
-  {
-    startTime: "11:00 AM",
-    endTime: "12:00 PM",
-    available: false,
-  },
-  {
-    startTime: "12:00 PM",
-    endTime: "01:00 PM",
-    available: true,
-  },
-];
-
+  // Show Next.js 404 page if the resource does not exist
+  if (error || !resource) {
+    notFound();
+  }
 
   return (
-    <main className='text-white my-4 mx-auto border p-6 rounded-lg shadow-md max-w-md flex flex-col items-center justify-center gap-4'>
+    <main className="min-h-screen p-6">
+      <div className="mx-auto max-w-2xl space-y-6">
+        {/* Resource information */}
+        <div>
+          <h1 className="text-3xl font-bold">
+            Book {resource.name}
+          </h1>
 
-    <BookingHeader />
-    <DateSelector value={selectedDate} onchange={setSelectedDate} />
-    <StartTime value={selectedStartTime} onchange={setSelectedStartTime} />
-    <EndTime value={selectedEndTime} onchange={setSelectedEndTime} />
-    <AvailableSlot slots={slots} selectedSlot={null} onSlotSelect={() => {}} />      
-      <Button label="Confirm Booking" variants='primary' onclick={handleConfirmBooking} />    
+          {resource.description && (
+            <p className="mt-2 text-gray-600">
+              {resource.description}
+            </p>
+          )}
+        </div>
+
+        {/* Booking form */}
+        <BookingForm resourceId={resource.id} />
+      </div>
     </main>
-  )
+  );
 }
-export default Page
