@@ -2,31 +2,36 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { getMyBookings, cancelBooking } from "@/lib/bookings";
-
-const supabase = createClient();
+import { getBookingsForCurrentUser } from "@/lib/bookings";
+import { cancelBookingAction, createBookingAction } from "@/lib/bookings/actions";
+import type { BookingRequest } from "@/schemas/bookingSchema";
 
 export function useBookings() {
+  return useQuery({
+    queryKey: ["bookings", "current-user"],
+    queryFn: () => getBookingsForCurrentUser(createClient()),
+  });
+}
+
+export function useCreateBooking() {
   const queryClient = useQueryClient();
-
-  const query = useQuery({
-    queryKey: ["bookings"],
-    queryFn: async () => {
-      return getMyBookings(supabase);
+  return useMutation({
+    mutationFn: (request: BookingRequest) => createBookingAction(request),
+    onSuccess: async (result) => {
+      if (result.success) await queryClient.invalidateQueries({ queryKey: ["bookings"] });
     },
   });
+}
 
-  const cancel = useMutation({
-    mutationFn: (bookingId: string) => cancelBooking(supabase, bookingId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+export function useCancelBooking() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (bookingId: string) => cancelBookingAction(bookingId),
+    onSuccess: async (result) => {
+      if (result.success) {
+        await queryClient.invalidateQueries({ queryKey: ["bookings"] });
+        await queryClient.invalidateQueries({ queryKey: ["resources"] });
+      }
     },
   });
-
-  return {
-    ...query,
-    bookings: query.data ?? [],
-    cancelBooking: cancel.mutate,
-    isCancelling: cancel.isPending,
-  };
 }
