@@ -1,90 +1,130 @@
-import {
-  CalendarCheck,
-  ShieldCheck,
-  Users,
-  Search
-} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, CalendarCheck } from "lucide-react";
 
-const features = [
-  {
-    icon: CalendarCheck,
-    title: "Real-time Availability",
-    description:
-      "See available mentor and study-group slots in real time and book instantly.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "No Double-Booking",
-    description:
-      "BookIt prevents overlapping bookings so everyone gets a reliable schedule.",
-  },
-  {
-    icon: Search,
-    title: "Find the Right Resource",
-    description:
-      "Search and discover mentors, office hours, study groups and peer sessions.",
-  },
-  {
-    icon: Users,
-    title: "Built for Fellows",
-    description:
-      "Connect, learn and grow with mentors and peers in one simple platform.",
-  },
-];
+export default function Hero() {
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-export default function Features() {
   return (
-    <section
-      id="features"
-      className="bg-slate-50 py-10"
-    >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="overflow-hidden bg-white">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:px-8 lg:py-20">
+        
+        {/* LEFT */}
+        <div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700">
+            <span className="h-2 w-2 rounded-full bg-primary-600" />
+            Mentorship made simple
+          </div>
 
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-semibold text-primary-600">
-            WHY BOOKIT
+          <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+            Book Mentors.
+            <br />
+            Join Study Groups.
+            <br />
+            <span className="text-primary-600">
+              Grow Together.
+            </span>
+          </h1>
+
+          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+            Book one-on-one sessions with mentors or join study groups with
+            your peers. Find the right time, avoid double-booking, and stay
+            focused.
           </p>
 
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-            Everything you need to make learning easier
-          </h2>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white shadow-lg shadow-primary-200 transition hover:bg-primary-700"
+            >
+              Get Started
+              <ArrowRight size={18} />
+            </Link>
 
-          <p className="mt-4 text-slate-600">
-            BookIt removes the stress of coordinating mentorship
-            and study sessions manually.
-          </p>
+            <a
+              href="#how-it-works"
+              className="rounded-lg border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:border-primary-600 hover:text-primary-600"
+            >
+              Learn More
+            </a>
+          </div>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* RIGHT */}
+        <div className="relative flex justify-center">
+          <div className="absolute h-80 w-80 rounded-full bg-primary-100 blur-3xl" />
 
-          {features.map((feature) => {
+          <div className="relative w-full max-w-lg">
+            <div className="absolute -right-2 top-12 h-20 w-16 rounded-2xl bg-primary-100" />
+            <div className="absolute -left-5 bottom-12 h-16 w-10 rounded-full bg-purple-100" />
 
-            const Icon = feature.icon;
+            <div className="relative overflow-hidden rounded-3xl border border-primary-100 bg-white shadow-2xl shadow-primary-100">
+              
+              {/* Calendar header */}
+              <div className="flex items-center justify-between bg-primary-600 px-6 py-5 text-white">
+                <div>
+                  <p className="text-xs font-medium text-white/80">
+                    BookIt Calendar
+                  </p>
 
-            return (
-              <div
-                key={feature.title}
-                className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-              >
-
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-                  <Icon size={24} />
+                  <p className="mt-1 font-bold">
+                    {currentDate}
+                  </p>
                 </div>
 
-                <h3 className="mt-5 text-lg font-bold text-slate-800">
-                  {feature.title}
-                </h3>
-
-                <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {feature.description}
-                </p>
-
+                <CalendarCheck size={26} />
               </div>
-            );
-          })}
 
+              {/* Image */}
+              <div className="p-5">
+                <Image
+                  src="/hero.jpg"
+                  alt="BookIt mentorship and study booking"
+                  priority
+                  className="h-auto w-full rounded-2xl object-cover"
+                  width={600}
+                  height={420}
+                />
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 border-t border-slate-100 px-5 py-6 text-center">
+                <div>
+                  <p className="text-xl font-bold text-slate-800">
+                    1-on-1
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Mentorship
+                  </p>
+                </div>
+
+                <div className="border-x border-slate-100">
+                  <p className="text-xl font-bold text-slate-800">
+                    Group
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Sessions
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xl font-bold text-slate-800">
+                    24/7
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Availability
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
-
       </div>
     </section>
   );

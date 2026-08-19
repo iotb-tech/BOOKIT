@@ -1,40 +1,140 @@
-import Link from 'next/link'
-import { Resource } from '@/types/resource'
-import { StatusBadge } from './StatusBadge'
+import Link from "next/link";
+import {
+  ArrowRight,
+  Clock3,
+} from "lucide-react";
 
-export function ResourceCard({ resource }: { resource: Resource }) {
-  const initial = (resource.owner_name ?? resource.name).charAt(0).toUpperCase()
+import type { Resource } from "@/types/resource";
+
+const avatarStyles = [
+  "from-amber-200 to-orange-400",
+  "from-indigo-200 to-primary-500",
+  "from-emerald-200 to-teal-500",
+  "from-rose-200 to-pink-500",
+];
+
+function getInitials(
+  resource: Resource
+) {
+  if (
+    resource.type === "Study Group"
+  ) {
+    const team =
+      resource.name.match(
+        /Team\s+(\d+)/i
+      );
+
+    if (team) {
+      return `T${team[1]}`;
+    }
+  }
+
+  return resource.name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function formatAvailability(
+  value?: string | null
+) {
+  if (!value) {
+    return "Check availability";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }
+  ).format(new Date(value));
+}
+
+export function ResourceCard({
+  resource,
+  index = 0,
+}: {
+  resource: Resource;
+  index?: number;
+}) {
+  const type =
+    resource.type ??
+    (resource.name
+      .toLowerCase()
+      .includes("group")
+      ? "Study Group"
+      : "Mentor");
+
+  const initials =
+    getInitials(resource);
+
+  const availabilityLabel =
+    type === "Study Group"
+      ? "Next session"
+      : "Next available";
 
   return (
-    <Link
-      href={`/resources/${resource.id}`}
-      className="block bg-white border border-neutral-200 rounded-lg p-4 active:bg-neutral-50 md:hover:shadow-sm md:hover:border-neutral-300 transition-all"
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 text-sm font-semibold flex items-center justify-center shrink-0">
-            {initial}
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-neutral-900 truncate">
-              {resource.name}
-            </p>
-            {resource.type && (
-              <p className="text-sm text-neutral-600 truncate">{resource.type}</p>
-            )}
-          </div>
+    <article className="group flex min-h-[270px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
+
+      <div className="flex items-start gap-3">
+        <div
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${
+            avatarStyles[
+              index %
+                avatarStyles.length
+            ]
+          } text-xs font-semibold text-white`}
+        >
+          {initials}
         </div>
-        <StatusBadge status={resource.status} />
+
+        <div>
+          <h2 className="text-base font-semibold text-slate-800">
+            {resource.name}
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            {type}
+          </p>
+        </div>
       </div>
 
-      <p className="text-sm text-neutral-600 mt-3 line-clamp-2">
+      <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-600">
         {resource.description}
       </p>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-neutral-600">
-        {resource.owner_name && <span>with {resource.owner_name}</span>}
-        {resource.duration_minutes && <span>{resource.duration_minutes} min</span>}
+      <div className="mt-auto pt-5">
+        <p className="text-xs font-medium text-slate-400">
+          {availabilityLabel}
+        </p>
+
+        <div className="mt-2 flex items-center gap-2 text-sm font-medium text-slate-600">
+          <Clock3
+            size={15}
+            className="text-slate-400"
+          />
+
+          {resource.status ===
+          "unavailable"
+            ? "No open slots"
+            : formatAvailability(
+                resource.next_available_at
+              )}
+        </div>
+
+        <Link
+          href={`/resources/${resource.id}`}
+          className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-primary-200 bg-primary-50/40 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-50"
+        >
+          View Availability
+          <ArrowRight size={15} />
+        </Link>
       </div>
-    </Link>
-  )
+    </article>
+  );
 }
