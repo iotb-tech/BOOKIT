@@ -1,49 +1,52 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Booking } from "@/types/booking";
 
-export type Booking = {
-  id: string;
-  resource_id: string;
-  user_id: string;
-  start_time: string;
-  end_time: string;
-  status: "confirmed" | "cancelled";
-  created_at: string;
-};
+const ENHANCED_SELECT = "id, resource_id, user_id, start_time, end_time, status, created_at, resources(name, type, duration_minutes)";
+const BASE_SELECT = "id, resource_id, user_id, start_time, end_time, status, created_at, resources(name)";
 
-/**
- * Get all bookings belonging to the logged-in user.
- */
-export async function fetchMyBookings(
-  supabase: SupabaseClient
-): Promise<Booking[]> {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*")
-    .order("start_time", { ascending: true });
+function normalizeBooking(row: Record<string, unknown>): Booking {
+  const relation = row.resources;
+  const resourceRow = Array.isArray(relation) ? relation[0] : relation;
+  const resource = resourceRow && typeof resourceRow === "object" ? (resourceRow as Record<string, unknown>) : null;
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data ?? [];
+  return {
+    id: String(row.id),
+    resource_id: String(row.resource_id),
+    user_id: String(row.user_id),
+    start_time: String(row.start_time),
+    end_time: String(row.end_time),
+    status: row.status === "cancelled" ? "cancelled" : "confirmed",
+    created_at: String(row.created_at),
+    resource: resource
+      ? {
+          name: String(resource.name ?? "Booked session"),
+          type: typeof resource.type === "string" ? resource.type : null,
+          duration_minutes: typeof resource.duration_minutes === "number" ? resource.duration_minutes : null,
+        }
+      : null,
+  };
 }
 
-/**
- * Get one booking by its ID.
- */
-export async function fetchBooking(
-  supabase: SupabaseClient,
-  bookingId: string
-): Promise<Booking | null> {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("id", bookingId)
-    .maybeSingle();
+export async function getBookingsForCurrentUser(supabase: SupabaseClient): Promise<Booking[]> {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) return [];
 
-  if (error) {
-    throw new Error(error.message);
+  const enhanced = await supabase
+    .from("bookings")
+    .select(ENHANCED_SELECT)
+    .eq("user_id", userData.user.id)
+    .order("start_time", { ascending: true });
+
+  if (!enhanced.error) {
+    return (enhanced.data ?? []).map((row) => normalizeBooking(row as unknown as Record<string, unknown>));
   }
 
-  return data;
+  const base = await supabase
+    .from("bookings")
+    .select(BASE_SELECT)
+    .eq("user_id", userData.user.id)
+    .order("start_time", { ascending: true });
+
+  if (base.error) throw new Error(base.error.message);
+  return (base.data ?? []).map((row) => normalizeBooking(row as unknown as Record<string, unknown>));
 }
