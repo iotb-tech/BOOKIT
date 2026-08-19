@@ -1,47 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
-import { getResources } from "@/lib/resources";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { ResourceList } from "@/components/resources/ResourceList";
 
-// This page displays all the resources available on BookIt.
-export default async function ResourcesPage() {
-  // Create a Supabase client to communicate with the database.
-  const supabase = await createClient();
-
-  // Fetch all resources from the database.
-  const resources = await getResources(supabase);
-
+export default function ResourcesPage() {
   return (
-    <main>
-      {/* Page heading */}
-      <h1>Resources</h1>
+    <main className="min-h-screen bg-[#fbfbfd] px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+      <div className="mx-auto max-w-7xl">
 
-      {/* Description of the Resources page */}
-      <p>Browse the resources available on BookIt.</p>
+        <Link
+          href="/dashboard"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-primary-700"
+        >
+          <ArrowLeft size={17} />
+          Back to Dashboard
+        </Link>
 
-      {/* Check whether any resources were found */}
-      {resources.length === 0 ? (
-        <p>No resources available.</p>
-      ) : (
-        <div>
-          {/* Display each resource */}
-          {resources.map((resource) => (
-            <div key={resource.id}>
-              {/* Resource name */}
-              <h2>{resource.name}</h2>
-
-              {/* Resource description */}
-              <p>{resource.description}</p>
-
-              {/* Resource type, if available */}
-              {resource.type && <p>Type: {resource.type}</p>}
-
-              {/* Owner name, if available */}
-              {resource.owner_name && (
-                <p>Owner: {resource.owner_name}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+        <ResourceList />
+      </div>
     </main>
   );
 }
