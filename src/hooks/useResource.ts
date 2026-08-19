@@ -11,6 +11,12 @@ export function useResource(id: string) {
     queryKey: ["resource", id],
 
     queryFn: async () => {
+      if (!supabase) {
+        throw new Error(
+          "Supabase is not configured. Check your .env.local file."
+        );
+      }
+
       return getResourceById(supabase, id);
     },
 

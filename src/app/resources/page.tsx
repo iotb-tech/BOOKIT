@@ -1,19 +1,22 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { ResourceList } from "@/components/resources/ResourceList";
 
 export default function ResourcesPage() {
   return (
-    <div>
-      <div className="flex items-center justify-between px-4 pt-6 sm:px-6">
-        <div />
+    <main className="min-h-screen bg-[#fbfbfd] px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+      <div className="mx-auto max-w-7xl">
+
         <Link
-          href="/resources/new"
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          href="/dashboard"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-primary-700"
         >
-          + New resource
+          <ArrowLeft size={17} />
+          Back to Dashboard
         </Link>
+
+        <ResourceList />
       </div>
-      <ResourceList />
-    </div>
+    </main>
   );
 }

@@ -1,44 +1,21 @@
 # BookIt
+Mentor office hours and study-group pairing sessions are currently coordinated ad hoc. When fellow were asked how they know whether a mentor or study group partner is free, here are some responses we received:
+- "I dont know,i just message"
+- "When he replies and also we must have established an agreement about when am available"
+- "I don’t"
+- "	I will reach out to them upfront to know when they will be free"
 
-BookIt is a scheduling platform for mentor office hours and study-group sessions. It replaces ad-hoc DM scheduling with a shared flow for discovering resources, choosing a time, booking a session, viewing personal bookings, and cancelling when plans change.
+Also they were some cases 71% occurrence where they found out the time they have chosen was already scheduled with another study group
 
-## Problem validation
+BookIt aims to solve this blocker by showing real available slots to users and grant them the ability to book one without a single back-and-forth DM, and prevent any cases of double-booking. 
 
-Early project responses showed that fellows often do not know whether a mentor or study partner is available before sending a message. Several respondents described relying on a reply or a prior agreement to know availability, and the team also recorded cases where a chosen time had already been scheduled elsewhere. The validation screenshots supplied by the team remain in `images/`.
+| Question asked | Response |
+| ---------- | ---------- |
+| This are the numbers of response | ![first image](images/mform1.jpg)   |
 
-The MVP therefore focuses on two outcomes:
 
-- Make availability and booking details visible in one place.
-- Prevent two confirmed bookings from occupying overlapping time ranges for the same resource.
-
-## Core routes
-
-- `/` — landing page
-- `/login` and `/signup` — email/password plus Google and GitHub OAuth
-- `/dashboard` — personal dashboard
-- `/dashboard/overview` — weekly overview and recent activity layout
-- `/resources` — resource browse/search/filter
-- `/resources/[id]` — resource detail and availability
-- `/book/[id]` — validated booking flow
-- `/my-bookings` — upcoming/past bookings and cancellation
-- `/messages`, `/profile`, `/settings` — navigation destinations used by the dashboard sidebar
-
-## Stack
-
-- Next.js App Router + TypeScript
-- Tailwind CSS
-- Supabase Auth + Postgres
-- React Hook Form + Zod
-- TanStack Query
-
-## Local setup
-
-```bash
-git clone <repository-url>
-cd BOOKIT
-npm install
-cp .env.example .env.local
-npm run dev
+# Getting started
+Clone and start the repository locally by running
 ```
 
 Set these values in `.env.local` from the team's shared Supabase project:
