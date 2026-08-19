@@ -36,23 +36,23 @@ export default function WhyBookIt() {
   return (
     <section
       id="about"
-      className="scroll-mt-24 bg-white py-24"
+      className=" bg-white py-24"
     >
       <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-2 lg:px-8">
 
         {/* Left Content */}
         <div>
-          <p className="font-semibold text-primary-600">
+          <p className="text-sm font-bold uppercase tracking-wide text-primary-600">
             BUILT FOR BETTER LEARNING
           </p>
 
-          <h2 className="mt-3 text-4xl font-bold leading-tight text-slate-950">
+          <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
             Less time coordinating.
             <br />
             More time learning.
           </h2>
 
-          <p className="mt-6 max-w-lg leading-7 text-slate-600">
+          <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
             BookIt replaces scattered DMs, spreadsheets and manual calendars
             with one simple booking experience for mentors and fellows.
           </p>
@@ -83,11 +83,11 @@ export default function WhyBookIt() {
                   <Icon size={22} />
                 </div>
 
-                <h3 className="mt-5 font-bold text-slate-800">
+                <h3 className="mt-5 text-lg font-bold text-slate-800">
                   {benefit.title}
                 </h3>
 
-                <p className="mt-3 text-sm leading-6 text-slate-600">
+                <p className="mt-3 text-base leading-7 text-slate-600">
                   {benefit.description}
                 </p>
               </div>

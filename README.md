@@ -1,24 +1,52 @@
 # BookIt
-Mentor office hours and study-group pairing sessions are currently coordinated ad hoc. When fellow were asked how they know whether a mentor or study group partner is free, here are some responses we received:
-- "I dont know,i just message"
-- "When he replies and also we must have established an agreement about when am available"
-- "I don’t"
-- "	I will reach out to them upfront to know when they will be free"
 
-Also they were some cases 71% occurrence where they found out the time they have chosen was already scheduled with another study group
+BookIt is a full-stack learning-session booking platform for mentors and study groups.
 
-BookIt aims to solve this blocker by showing real available slots to users and grant them the ability to book one without a single back-and-forth DM, and prevent any cases of double-booking. 
+It helps authenticated users discover learning resources, view real availability, book a specific time slot, manage upcoming and past sessions, and cancel future bookings without back-and-forth scheduling messages.
 
-| Question asked | Response |
-| ---------- | ---------- |
-| This are the numbers of response | ![first image](images/mform1.jpg)   |
+## Core Features
 
+- Email/password authentication with Supabase
+- Google and GitHub OAuth
+- Protected authenticated routes
+- Dashboard with booking statistics
+- Mentor and study-group discovery
+- Resource search and filtering
+- Dynamic resource detail pages
+- Multiple availability slots per resource
+- Atomic slot-based booking
+- Database-level overlap protection
+- My Bookings with Upcoming and Past views
+- Booking cancellation with future-slot release
+- Responsive authenticated navigation
 
-# Getting started
-Clone and start the repository locally by running
-```
- git clone [project-url]
- cd bookit
- npm install 
- npm run dev
-````
+## Technology Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS
+- Supabase Authentication
+- Supabase PostgreSQL
+- TanStack Query
+- React Hook Form
+- Zod
+- Lucide React
+- Git and GitHub
+
+## Project Structure
+
+```text
+src/
+  app/
+  components/
+  hooks/
+  lib/
+  providers/
+  schemas/
+  types/
+
+supabase/
+  schema.sql
+  seed.sql
+  migrations/

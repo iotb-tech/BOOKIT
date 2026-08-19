@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  CalendarDays,
-  Clock3,
-} from "lucide-react";
-
+import { CalendarDays, Clock3 } from "lucide-react";
 import type { Booking } from "@/types/booking";
 import { useCancelBooking } from "@/hooks/useBookings";
 
@@ -23,10 +19,7 @@ function formatTime(iso: string) {
   }).format(new Date(iso));
 }
 
-function isStudyGroup(
-  name?: string | null,
-  type?: string | null
-) {
+function isStudyGroup(name?: string | null, type?: string | null) {
   const normalizedType = (type ?? "")
     .trim()
     .toLowerCase()
@@ -76,8 +69,7 @@ export default function BookingCard({
   const resourceName =
     booking.resource?.name ?? "Booked Session";
 
-  const resourceType =
-    booking.resource?.type;
+  const resourceType = booking.resource?.type;
 
   const studyGroup = isStudyGroup(
     resourceName,
@@ -89,11 +81,22 @@ export default function BookingCard({
     resourceType
   );
 
+  const now = Date.now();
+
   const isConfirmed =
     booking.status === "confirmed";
 
   const isCancelled =
     booking.status === "cancelled";
+
+  const isCompleted =
+    !isCancelled &&
+    new Date(booking.end_time).getTime() < now;
+
+  const canCancel =
+    cancellable &&
+    isConfirmed &&
+    new Date(booking.start_time).getTime() > now;
 
   const avatarStyle = studyGroup
     ? index % 2
@@ -105,38 +108,36 @@ export default function BookingCard({
 
   const statusLabel = isCancelled
     ? "Cancelled"
-    : cancellable
-      ? "Confirmed"
-      : "Completed";
+    : isCompleted
+      ? "Completed"
+      : "Confirmed";
 
   const statusClasses = isCancelled
     ? "bg-rose-50 text-rose-700"
-    : cancellable
-      ? "bg-green-50 text-green-700"
-      : "bg-blue-50 text-blue-700";
+    : isCompleted
+      ? "bg-blue-50 text-blue-700"
+      : "bg-green-50 text-green-700";
 
   const handleCancel = async () => {
     const confirmed = window.confirm(
-      "Cancel this booking? The slot will become available again."
+      "Cancel this booking? If the session has not started, the slot will become available again."
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
-    const result = await cancel.mutateAsync(
-      booking.id
-    );
+    const result = await cancel.mutateAsync(booking.id);
 
     if (!result.success) {
       window.alert(
-        result.error ||
-          "Unable to cancel this booking."
+        result.error || "Unable to cancel this booking."
       );
     }
   };
 
   return (
     <article className="grid items-center gap-5 border-b border-slate-100 py-5 last:border-b-0 sm:grid-cols-[1.4fr_1fr_auto_auto]">
-      {/* Resource */}
       <div className="flex min-w-0 items-center gap-4">
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${avatarStyle}`}
@@ -157,7 +158,6 @@ export default function BookingCard({
         </div>
       </div>
 
-      {/* Date / Time */}
       <div className="space-y-2 text-sm text-slate-500">
         <p className="flex items-center gap-2">
           <CalendarDays
@@ -174,29 +174,26 @@ export default function BookingCard({
             className="text-slate-400"
           />
 
-          {formatTime(booking.start_time)} -{" "}
+          {formatTime(booking.start_time)}
+          {" - "}
           {formatTime(booking.end_time)}
         </p>
       </div>
 
-      {/* Status */}
       <span
         className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${statusClasses}`}
       >
         {statusLabel}
       </span>
 
-      {/* Cancel */}
-      {cancellable && isConfirmed ? (
+      {canCancel ? (
         <button
           type="button"
           onClick={handleCancel}
           disabled={cancel.isPending}
           className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {cancel.isPending
-            ? "Cancelling..."
-            : "Cancel"}
+          {cancel.isPending ? "Cancelling..." : "Cancel"}
         </button>
       ) : (
         <span className="hidden sm:block" />

@@ -10,11 +10,26 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
-import { useResources } from "@/lib/resources/hooks";
-import { ResourceCard } from "./ResourceCard";
-import { ResourceListSkeleton } from "./ResourceListSkeleton";
-import { ResourceError } from "./ResourceError";
-import { ResourceEmpty } from "./ResourceEmpty";
+import {
+  useResources,
+} from "@/lib/resources/hooks";
+
+import {
+  ResourceCard,
+} from "./ResourceCard";
+
+import {
+  ResourceListSkeleton,
+} from "./ResourceListSkeleton";
+
+import {
+  ResourceError,
+} from "./ResourceError";
+
+import {
+  ResourceEmpty,
+} from "./ResourceEmpty";
+
 import PageBadge from "@/components/ui/PageBadge";
 
 import type {
@@ -22,28 +37,40 @@ import type {
   ResourceType,
 } from "@/types/resource";
 
-/* =========================================================
-   HELPERS
-========================================================= */
-
 function normalizeResourceType(
-  type?: string | null,
-  name?: string | null
+  type?:
+    | string
+    | null,
+
+  name?:
+    | string
+    | null
 ): ResourceType {
   const normalized =
-    (type ?? "")
+    (
+      type ??
+      ""
+    )
       .trim()
       .toLowerCase()
-      .replace(/[\s-]+/g, "_");
+      .replace(
+        /[\s-]+/g,
+        "_"
+      );
 
   if (
     normalized ===
       "study_group" ||
     normalized ===
       "studygroup" ||
-    (name ?? "")
+    (
+      name ??
+      ""
+    )
       .toLowerCase()
-      .includes("study group")
+      .includes(
+        "study group"
+      )
   ) {
     return "Study Group";
   }
@@ -51,41 +78,55 @@ function normalizeResourceType(
   return "Mentor";
 }
 
-/* =========================================================
-   COMPONENT
-========================================================= */
-
 export function ResourceList() {
   const {
-    data: resources = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useResources();
+    data:
+      resources = [],
 
-  const [search, setSearch] =
+    isLoading,
+
+    isError,
+
+    refetch,
+  } =
+    useResources();
+
+  const [
+    search,
+    setSearch,
+  ] =
     useState("");
 
   const [
     showFilters,
     setShowFilters,
-  ] = useState(false);
+  ] =
+    useState(false);
 
-  const [status, setStatus] =
+  const [
+    status,
+    setStatus,
+  ] =
     useState<
-      ResourceStatus | "all"
+      | ResourceStatus
+      | "all"
     >("all");
 
-  const [type, setType] =
+  const [
+    type,
+    setType,
+  ] =
     useState<
-      ResourceType | "all"
+      | ResourceType
+      | "all"
     >("all");
 
   const filtered =
     useMemo(() => {
-      const query = search
-        .trim()
-        .toLowerCase();
+      const query =
+        search
+          .trim()
+          .toLowerCase();
 
       return resources.filter(
         (resource) => {
@@ -95,18 +136,25 @@ export function ResourceList() {
               resource.name
             );
 
-          const searchableText = [
-            resource.name,
-            resource.description ??
-              "",
-            resource.owner_name ??
-              "",
-            resourceType,
-            ...(resource.skills ??
-              []),
-          ]
-            .join(" ")
-            .toLowerCase();
+          const searchableText =
+            [
+              resource.name,
+
+              resource.description ??
+                "",
+
+              resource.owner_name ??
+                "",
+
+              resourceType,
+
+              ...(
+                resource.skills ??
+                []
+              ),
+            ]
+              .join(" ")
+              .toLowerCase();
 
           const matchesSearch =
             !query ||
@@ -115,11 +163,14 @@ export function ResourceList() {
             );
 
           const matchesType =
-            type === "all" ||
-            resourceType === type;
+            type ===
+              "all" ||
+            resourceType ===
+              type;
 
           const matchesStatus =
-            status === "all" ||
+            status ===
+              "all" ||
             resource.status ===
               status;
 
@@ -139,13 +190,7 @@ export function ResourceList() {
 
   return (
     <div>
-      {/* =========================================
-          SEARCH / FILTER
-      ========================================= */}
-
       <div className="flex flex-col gap-3 sm:flex-row">
-
-        {/* Search */}
         <label className="relative flex-1">
           <span className="sr-only">
             Search resources
@@ -159,9 +204,12 @@ export function ResourceList() {
           <input
             type="search"
             value={search}
-            onChange={(event) =>
+            onChange={(
+              event
+            ) =>
               setSearch(
-                event.target.value
+                event.target
+                  .value
               )
             }
             placeholder="Search resources, mentors, or study groups..."
@@ -169,7 +217,6 @@ export function ResourceList() {
           />
         </label>
 
-        {/* Filter */}
         <button
           type="button"
           onClick={() =>
@@ -186,22 +233,20 @@ export function ResourceList() {
           <SlidersHorizontal
             size={17}
           />
+
           Filter
         </button>
       </div>
 
-      {/* =========================================
-          FILTER OPTIONS
-      ========================================= */}
-
       {showFilters && (
         <div className="mt-3 flex flex-wrap gap-3 rounded-xl border border-slate-200 bg-white p-4">
 
-          {/* Type */}
           <select
             value={type}
             aria-label="Filter by resource type"
-            onChange={(event) =>
+            onChange={(
+              event
+            ) =>
               setType(
                 event.target
                   .value as
@@ -224,11 +269,12 @@ export function ResourceList() {
             </option>
           </select>
 
-          {/* Status */}
           <select
             value={status}
             aria-label="Filter by availability"
-            onChange={(event) =>
+            onChange={(
+              event
+            ) =>
               setStatus(
                 event.target
                   .value as
@@ -246,25 +292,32 @@ export function ResourceList() {
               Available
             </option>
 
-            <option value="maintenance">
-              Limited
-            </option>
-
             <option value="unavailable">
               Unavailable
             </option>
+
+            <option value="maintenance">
+              Maintenance
+            </option>
           </select>
 
-          {/* Clear */}
-          {(type !== "all" ||
-            status !== "all" ||
+          {(type !==
+            "all" ||
+            status !==
+              "all" ||
             search) && (
             <button
               type="button"
               onClick={() => {
                 setSearch("");
-                setType("all");
-                setStatus("all");
+
+                setType(
+                  "all"
+                );
+
+                setStatus(
+                  "all"
+                );
               }}
               className="text-sm font-medium text-primary-700 transition hover:text-primary-800"
             >
@@ -274,52 +327,46 @@ export function ResourceList() {
         </div>
       )}
 
-      {/* =========================================
-          PAGE HEADING
-      ========================================= */}
-
       <div className="mt-8">
-        <PageBadge label="Resources" />
+        <PageBadge
+          label="Resources"
+        />
 
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-800">
-          Find the right resource
+          Find the right
+          resource
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Discover mentors and study groups and book a time that works for you.
+          Discover mentors
+          and study groups
+          and book a time
+          that works for you.
         </p>
       </div>
 
-      {/* =========================================
-          RESULT COUNT
-      ========================================= */}
-
       {!isLoading &&
         !isError &&
-        resources.length > 0 && (
+        resources.length >
+          0 && (
           <div className="mt-6 flex items-center justify-between">
             <p className="text-sm text-slate-500">
-              {filtered.length}{" "}
-              {filtered.length === 1
+              {
+                filtered.length
+              }{" "}
+              {filtered.length ===
+              1
                 ? "resource"
-                : "resources"}{" "}
-              available
+                : "resources"}
             </p>
           </div>
         )}
 
-      {/* =========================================
-          RESULTS
-      ========================================= */}
-
       <div className="mt-5">
-
-        {/* Loading */}
         {isLoading && (
           <ResourceListSkeleton />
         )}
 
-        {/* Error */}
         {isError && (
           <ResourceError
             onRetry={() =>
@@ -328,7 +375,6 @@ export function ResourceList() {
           />
         )}
 
-        {/* Empty */}
         {!isLoading &&
           !isError &&
           filtered.length ===
@@ -340,10 +386,10 @@ export function ResourceList() {
             />
           )}
 
-        {/* Resource Grid */}
         {!isLoading &&
           !isError &&
-          filtered.length > 0 && (
+          filtered.length >
+            0 && (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map(
                 (

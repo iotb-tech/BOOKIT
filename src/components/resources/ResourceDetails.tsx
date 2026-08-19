@@ -5,38 +5,78 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Clock3,
-  MessageCircle,
-  Star,
 } from "lucide-react";
 
-import { useResource } from "@/lib/resources/hooks";
-import { useResourceAvailability } from "@/hooks/useResourceAvailability";
+import {
+  useResource,
+} from "@/lib/resources/hooks";
 
-import { ResourceDetailSkeleton } from "./ResourceDetailSkeleton";
-import { ResourceError } from "./ResourceError";
+import {
+  useResourceAvailability,
+} from "@/hooks/useResourceAvailability";
+
+import {
+  ResourceDetailSkeleton,
+} from "./ResourceDetailSkeleton";
+
+import {
+  ResourceError,
+} from "./ResourceError";
 
 function isStudyGroup(
-  name?: string | null,
-  type?: string | null
+  name?:
+    | string
+    | null,
+
+  type?:
+    | string
+    | null
 ) {
-  const normalizedType = (type ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/[\s-]+/g, "_");
+  const normalizedType =
+    (
+      type ??
+      ""
+    )
+      .trim()
+      .toLowerCase()
+      .replace(
+        /[\s-]+/g,
+        "_"
+      );
 
   return (
-    normalizedType === "study_group" ||
-    normalizedType === "studygroup" ||
-    (name ?? "").toLowerCase().includes("study group")
+    normalizedType ===
+      "study_group" ||
+    normalizedType ===
+      "studygroup" ||
+    (
+      name ??
+      ""
+    )
+      .toLowerCase()
+      .includes(
+        "study group"
+      )
   );
 }
 
 function getInitials(
   name: string,
-  type?: string | null
+
+  type?:
+    | string
+    | null
 ) {
-  if (isStudyGroup(name, type)) {
-    const teamMatch = name.match(/Team\s+(\d+)/i);
+  if (
+    isStudyGroup(
+      name,
+      type
+    )
+  ) {
+    const teamMatch =
+      name.match(
+        /Team\s+(\d+)/i
+      );
 
     if (teamMatch) {
       return `T${teamMatch[1]}`;
@@ -46,30 +86,54 @@ function getInitials(
   return name
     .split(/\s+/)
     .filter(Boolean)
-    .map((part) => part[0])
+    .map(
+      (part) =>
+        part[0]
+    )
     .join("")
     .slice(0, 2)
     .toUpperCase();
 }
 
-function formatSlotDate(iso: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-  }).format(new Date(iso));
+function formatSlotDate(
+  iso: string
+) {
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+    }
+  ).format(
+    new Date(iso)
+  );
 }
 
-function formatSlotDay(iso: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "short",
-  }).format(new Date(iso));
+function formatSlotDay(
+  iso: string
+) {
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      weekday: "short",
+    }
+  ).format(
+    new Date(iso)
+  );
 }
 
-function formatSlotTime(iso: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(iso));
+function formatSlotTime(
+  iso: string
+) {
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      hour: "numeric",
+      minute: "2-digit",
+    }
+  ).format(
+    new Date(iso)
+  );
 }
 
 export function ResourceDetails({
@@ -78,50 +142,78 @@ export function ResourceDetails({
   id: string;
 }) {
   const {
-    data: resource,
+    data:
+      resource,
+
     isLoading,
+
     isError,
+
     refetch,
-  } = useResource(id);
+  } =
+    useResource(id);
 
   const {
-    data: availability = [],
-    isLoading: availabilityLoading,
-    isError: availabilityError,
-    refetch: refetchAvailability,
-  } = useResourceAvailability(id);
+    data:
+      availability = [],
+
+    isLoading:
+      availabilityLoading,
+
+    isError:
+      availabilityError,
+
+    refetch:
+      refetchAvailability,
+  } =
+    useResourceAvailability(
+      id
+    );
 
   if (isLoading) {
-    return <ResourceDetailSkeleton />;
+    return (
+      <ResourceDetailSkeleton />
+    );
   }
 
-  if (isError || !resource) {
+  if (
+    isError ||
+    !resource
+  ) {
     return (
       <ResourceError
-        onRetry={() => refetch()}
+        onRetry={() =>
+          refetch()
+        }
         message="This resource could not be loaded."
       />
     );
   }
 
-  const studyGroup = isStudyGroup(
-    resource.name,
-    resource.type
-  );
+  const studyGroup =
+    isStudyGroup(
+      resource.name,
+      resource.type
+    );
 
-  const type = studyGroup
-    ? "Study Group"
-    : "Mentor";
+  const type =
+    studyGroup
+      ? "Study Group"
+      : "Mentor";
 
-  const displayName = resource.name;
+  const initials =
+    getInitials(
+      resource.name,
+      resource.type
+    );
 
-  const initials = getInitials(
-    displayName,
-    resource.type
-  );
+  const canBook =
+    resource.status ===
+    "available";
 
   const skills =
-    resource.skills?.length
+    resource.skills
+      ?.length
       ? resource.skills
       : studyGroup
         ? [
@@ -135,50 +227,66 @@ export function ResourceDetails({
             "Technical Guidance",
           ];
 
+  const statusText =
+    resource.status ===
+    "available"
+      ? "Available for booking"
+      : resource.status ===
+        "maintenance"
+        ? "Temporarily unavailable"
+        : "Currently unavailable";
+
   return (
     <div>
-      {/* Back */}
       <Link
         href="/resources"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-primary-700"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft
+          size={16}
+        />
+
         Back to Resources
       </Link>
 
       <section className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.03)]">
-        {/* Main information */}
         <div className="grid md:grid-cols-[1.45fr_1fr]">
-          {/* Left */}
+
           <div className="p-6 md:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-              {/* Avatar */}
+
               <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 to-orange-400 text-xl font-semibold text-white sm:h-28 sm:w-28">
-                {initials}
+                {
+                  initials
+                }
               </div>
 
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-800">
-                  {displayName}
+                  {
+                    resource.name
+                  }
                 </h1>
 
                 <p className="mt-1 text-sm font-medium text-primary-700">
                   {type}
                 </p>
 
-                {/* Rating */}
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
-                  <Star
-                    size={15}
-                    className="fill-amber-400 text-amber-400"
-                  />
-
-                  <span className="font-semibold text-slate-700">
-                    5.0
-                  </span>
-
-                  <span>(24 reviews)</span>
-                </div>
+                <span
+                  className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                    resource.status ===
+                    "available"
+                      ? "bg-green-50 text-green-700"
+                      : resource.status ===
+                        "maintenance"
+                        ? "bg-amber-50 text-amber-700"
+                        : "bg-slate-100 text-slate-600"
+                  }`}
+                >
+                  {
+                    statusText
+                  }
+                </span>
 
                 <p className="mt-4 max-w-md text-sm leading-6 text-slate-600">
                   {resource.description ||
@@ -187,8 +295,7 @@ export function ResourceDetails({
               </div>
             </div>
 
-            {/* Session information */}
-            <div className="mt-7 space-y-3 text-sm text-slate-600">
+            <div className="mt-7 text-sm text-slate-600">
               <p className="flex items-center gap-2">
                 <Clock3
                   size={16}
@@ -197,27 +304,17 @@ export function ResourceDetails({
 
                 {studyGroup
                   ? `Sessions usually run for ${
-                      resource.duration_minutes ?? 60
+                      resource.duration_minutes ??
+                      60
                     } minutes`
                   : `Mentorship sessions are usually ${
-                      resource.duration_minutes ?? 60
+                      resource.duration_minutes ??
+                      60
                     } minutes`}
-              </p>
-
-              <p className="flex items-center gap-2">
-                <MessageCircle
-                  size={16}
-                  className="text-slate-400"
-                />
-
-                {studyGroup
-                  ? "Open to participating fellows"
-                  : "Typically responds within a day"}
               </p>
             </div>
           </div>
 
-          {/* Right / About */}
           <div className="border-t border-slate-200 p-6 md:border-l md:border-t-0 md:p-8">
             <h2 className="text-base font-semibold text-slate-800">
               About
@@ -233,21 +330,27 @@ export function ResourceDetails({
             </h3>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="rounded-md border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"
-                >
-                  {skill}
-                </span>
-              ))}
+              {skills.map(
+                (skill) => (
+                  <span
+                    key={
+                      skill
+                    }
+                    className="rounded-md border border-primary-100 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700"
+                  >
+                    {
+                      skill
+                    }
+                  </span>
+                )
+              )}
             </div>
           </div>
         </div>
 
-        {/* Availability */}
         <div className="border-t border-slate-200 p-5 sm:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
             <div className="min-w-0 flex-1">
               <h2 className="text-base font-semibold text-slate-800">
                 {studyGroup
@@ -255,23 +358,48 @@ export function ResourceDetails({
                   : "Next Available Slots"}
               </h2>
 
-              {/* Loading */}
-              {availabilityLoading ? (
+              {!canBook ? (
+                <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-5 py-6">
+                  <p className="text-sm font-medium text-slate-700">
+                    Booking is
+                    currently
+                    unavailable
+                    for this
+                    resource.
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Check back
+                    when the
+                    resource
+                    status changes
+                    to available.
+                  </p>
+                </div>
+              ) : availabilityLoading ? (
                 <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
                   {Array.from({
                     length: 3,
-                  }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-[105px] animate-pulse rounded-lg border border-slate-200 bg-slate-50"
-                    />
-                  ))}
+                  }).map(
+                    (
+                      _,
+                      index
+                    ) => (
+                      <div
+                        key={
+                          index
+                        }
+                        className="h-[105px] animate-pulse rounded-lg border border-slate-200 bg-slate-50"
+                      />
+                    )
+                  )}
                 </div>
               ) : availabilityError ? (
-                /* Error */
                 <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-5 py-5">
                   <p className="text-sm font-medium text-red-700">
-                    Availability could not be loaded.
+                    Availability
+                    could not
+                    be loaded.
                   </p>
 
                   <button
@@ -284,8 +412,8 @@ export function ResourceDetails({
                     Try again
                   </button>
                 </div>
-              ) : availability.length === 0 ? (
-                /* Empty */
+              ) : availability.length ===
+                0 ? (
                 <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-5 py-6">
                   <p className="text-sm font-medium text-slate-700">
                     {studyGroup
@@ -294,54 +422,65 @@ export function ResourceDetails({
                   </p>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    Check back later for new sessions.
+                    Check back
+                    later for
+                    new sessions.
                   </p>
                 </div>
               ) : (
-                /* Slots */
                 <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
                   {availability
-                    .slice(0, 5)
-                    .map((slot) => (
-                      <Link
-                        key={slot.id}
-                        href={`/book/${resource.id}?slot=${slot.id}`}
-                        className="rounded-lg border border-slate-200 px-4 py-4 text-center transition hover:border-primary-300 hover:bg-primary-50"
-                      >
-                        <p className="text-sm font-semibold text-slate-700">
-                          {formatSlotDay(
-                            slot.start_time
-                          )}
-                        </p>
+                    .slice(
+                      0,
+                      5
+                    )
+                    .map(
+                      (
+                        slot
+                      ) => (
+                        <Link
+                          key={
+                            slot.id
+                          }
+                          href={`/book/${resource.id}?slot=${slot.id}`}
+                          className="rounded-lg border border-slate-200 px-4 py-4 text-center transition hover:border-primary-300 hover:bg-primary-50"
+                        >
+                          <p className="text-sm font-semibold text-slate-700">
+                            {formatSlotDay(
+                              slot.start_time
+                            )}
+                          </p>
 
-                        <p className="mt-1 text-sm text-slate-500">
-                          {formatSlotDate(
-                            slot.start_time
-                          )}
-                        </p>
+                          <p className="mt-1 text-sm text-slate-500">
+                            {formatSlotDate(
+                              slot.start_time
+                            )}
+                          </p>
 
-                        <p className="mt-2 text-sm font-semibold text-primary-700">
-                          {formatSlotTime(
-                            slot.start_time
-                          )}
-                        </p>
+                          <p className="mt-2 text-sm font-semibold text-primary-700">
+                            {formatSlotTime(
+                              slot.start_time
+                            )}
+                          </p>
 
-                        <p className="mt-1 text-xs text-slate-400">
-                          to{" "}
-                          {formatSlotTime(
-                            slot.end_time
-                          )}
-                        </p>
-                      </Link>
-                    ))}
+                          <p className="mt-1 text-xs text-slate-400">
+                            to{" "}
+                            {formatSlotTime(
+                              slot.end_time
+                            )}
+                          </p>
+                        </Link>
+                      )
+                    )}
                 </div>
               )}
             </div>
 
-            {/* Main CTA */}
-            {!availabilityLoading &&
+            {canBook &&
+              !availabilityLoading &&
               !availabilityError &&
-              availability.length > 0 && (
+              availability.length >
+                0 && (
                 <Link
                   href={`/book/${resource.id}?slot=${availability[0].id}`}
                   className="flex h-11 shrink-0 items-center justify-center rounded-lg bg-primary-600 px-6 text-sm font-semibold text-white transition hover:bg-primary-700"
