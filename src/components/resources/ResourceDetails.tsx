@@ -1,9 +1,15 @@
 "use client";
 
+import {
+  useMemo,
+  useState,
+} from "react";
+
 import Link from "next/link";
 
 import {
   ArrowLeft,
+  CalendarDays,
   Clock3,
 } from "lucide-react";
 
@@ -23,26 +29,23 @@ import {
   ResourceError,
 } from "./ResourceError";
 
-function isStudyGroup(
-  name?:
-    | string
-    | null,
+/* =========================================================
+   HELPERS
+========================================================= */
 
-  type?:
-    | string
-    | null
+function isStudyGroup(
+  name?: string | null,
+  type?: string | null
 ) {
-  const normalizedType =
-    (
-      type ??
-      ""
-    )
-      .trim()
-      .toLowerCase()
-      .replace(
-        /[\s-]+/g,
-        "_"
-      );
+  const normalizedType = (
+    type ?? ""
+  )
+    .trim()
+    .toLowerCase()
+    .replace(
+      /[\s-]+/g,
+      "_"
+    );
 
   return (
     normalizedType ===
@@ -50,8 +53,7 @@ function isStudyGroup(
     normalizedType ===
       "studygroup" ||
     (
-      name ??
-      ""
+      name ?? ""
     )
       .toLowerCase()
       .includes(
@@ -62,10 +64,7 @@ function isStudyGroup(
 
 function getInitials(
   name: string,
-
-  type?:
-    | string
-    | null
+  type?: string | null
 ) {
   if (
     isStudyGroup(
@@ -95,13 +94,60 @@ function getInitials(
     .toUpperCase();
 }
 
-function formatSlotDate(
+function getDateKey(
+  iso: string
+) {
+  const date =
+    new Date(iso);
+
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "Africa/Lagos",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }
+    ).formatToParts(
+      date
+    );
+
+  const year =
+    parts.find(
+      (part) =>
+        part.type ===
+        "year"
+    )?.value;
+
+  const month =
+    parts.find(
+      (part) =>
+        part.type ===
+        "month"
+    )?.value;
+
+  const day =
+    parts.find(
+      (part) =>
+        part.type ===
+        "day"
+    )?.value;
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatFullDate(
   iso: string
 ) {
   return new Intl.DateTimeFormat(
     "en-US",
     {
-      month: "short",
+      timeZone:
+        "Africa/Lagos",
+      weekday: "long",
+      month: "long",
       day: "numeric",
     }
   ).format(
@@ -109,13 +155,17 @@ function formatSlotDate(
   );
 }
 
-function formatSlotDay(
+function formatShortDate(
   iso: string
 ) {
   return new Intl.DateTimeFormat(
     "en-US",
     {
+      timeZone:
+        "Africa/Lagos",
       weekday: "short",
+      month: "short",
+      day: "numeric",
     }
   ).format(
     new Date(iso)
@@ -128,41 +178,57 @@ function formatSlotTime(
   return new Intl.DateTimeFormat(
     "en-US",
     {
+      timeZone:
+        "Africa/Lagos",
       hour: "numeric",
       minute: "2-digit",
+      hour12: true,
     }
   ).format(
     new Date(iso)
   );
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export function ResourceDetails({
   id,
 }: {
   id: string;
 }) {
-  const {
-    data:
-      resource,
+  const [
+    selectedDate,
+    setSelectedDate,
+  ] = useState("");
 
+  const [
+    selectedSlotId,
+    setSelectedSlotId,
+  ] = useState("");
+
+  /* -------------------------------------------------------
+     RESOURCE
+  ------------------------------------------------------- */
+
+  const {
+    data: resource,
     isLoading,
-
     isError,
-
     refetch,
-  } =
-    useResource(id);
+  } = useResource(id);
+
+  /* -------------------------------------------------------
+     AVAILABILITY
+  ------------------------------------------------------- */
 
   const {
-    data:
-      availability = [],
-
+    data: availability = [],
     isLoading:
       availabilityLoading,
-
     isError:
       availabilityError,
-
     refetch:
       refetchAvailability,
   } =
@@ -170,11 +236,114 @@ export function ResourceDetails({
       id
     );
 
+  /* -------------------------------------------------------
+     GROUP AVAILABLE SLOTS BY DATE
+  ------------------------------------------------------- */
+
+  const availableDates =
+    useMemo(() => {
+      const dates =
+        new Map<
+          string,
+          {
+            value: string;
+            label: string;
+          }
+        >();
+
+      availability.forEach(
+        (slot) => {
+          const key =
+            getDateKey(
+              slot.start_time
+            );
+
+          if (
+            !dates.has(key)
+          ) {
+            dates.set(
+              key,
+              {
+                value:
+                  key,
+
+                label:
+                  formatShortDate(
+                    slot.start_time
+                  ),
+              }
+            );
+          }
+        }
+      );
+
+      return Array.from(
+        dates.values()
+      );
+    }, [availability]);
+
+  /* -------------------------------------------------------
+     DEFAULT TO FIRST AVAILABLE DAY
+  ------------------------------------------------------- */
+
+  const selectedDateStillExists =
+    availableDates.some(
+      (date) =>
+        date.value ===
+        selectedDate
+    );
+
+  const activeDate =
+    selectedDateStillExists
+      ? selectedDate
+      : availableDates[0]
+          ?.value ?? "";
+
+  /* -------------------------------------------------------
+     TIMES FOR SELECTED DAY
+  ------------------------------------------------------- */
+
+  const slotsForSelectedDate =
+    useMemo(() => {
+      if (!activeDate) {
+        return [];
+      }
+
+      return availability.filter(
+        (slot) =>
+          getDateKey(
+            slot.start_time
+          ) === activeDate
+      );
+    }, [
+      availability,
+      activeDate,
+    ]);
+
+  /* -------------------------------------------------------
+     SELECTED SLOT
+  ------------------------------------------------------- */
+
+  const selectedSlot =
+    availability.find(
+      (slot) =>
+        slot.id ===
+        selectedSlotId
+    );
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
   if (isLoading) {
     return (
       <ResourceDetailSkeleton />
     );
   }
+
+  /* =======================================================
+     RESOURCE ERROR
+  ======================================================= */
 
   if (
     isError ||
@@ -189,6 +358,10 @@ export function ResourceDetails({
       />
     );
   }
+
+  /* =======================================================
+     RESOURCE VALUES
+  ======================================================= */
 
   const studyGroup =
     isStudyGroup(
@@ -211,6 +384,14 @@ export function ResourceDetails({
     resource.status ===
     "available";
 
+  const sessionDuration =
+    resource.duration_minutes ??
+    (
+      studyGroup
+        ? 90
+        : 60
+    );
+
   const skills =
     resource.skills
       ?.length
@@ -232,12 +413,18 @@ export function ResourceDetails({
     "available"
       ? "Available for booking"
       : resource.status ===
-        "maintenance"
+          "maintenance"
         ? "Temporarily unavailable"
         : "Currently unavailable";
 
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
   return (
     <div>
+      {/* BACK BUTTON */}
+
       <Link
         href="/resources"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-primary-700"
@@ -249,17 +436,30 @@ export function ResourceDetails({
         Back to Resources
       </Link>
 
+      {/* MAIN RESOURCE CARD */}
+
       <section className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.03)]">
+
+        {/* =================================================
+            RESOURCE INFORMATION
+        ================================================= */}
+
         <div className="grid md:grid-cols-[1.45fr_1fr]">
+
+          {/* LEFT SIDE */}
 
           <div className="p-6 md:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+
+              {/* AVATAR */}
 
               <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 to-orange-400 text-xl font-semibold text-white sm:h-28 sm:w-28">
                 {
                   initials
                 }
               </div>
+
+              {/* DETAILS */}
 
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-800">
@@ -272,13 +472,15 @@ export function ResourceDetails({
                   {type}
                 </p>
 
+                {/* STATUS */}
+
                 <span
                   className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                     resource.status ===
                     "available"
                       ? "bg-green-50 text-green-700"
                       : resource.status ===
-                        "maintenance"
+                          "maintenance"
                         ? "bg-amber-50 text-amber-700"
                         : "bg-slate-100 text-slate-600"
                   }`}
@@ -288,6 +490,8 @@ export function ResourceDetails({
                   }
                 </span>
 
+                {/* DESCRIPTION */}
+
                 <p className="mt-4 max-w-md text-sm leading-6 text-slate-600">
                   {resource.description ||
                     "Practical guidance focused on learning, collaboration and real-world projects."}
@@ -295,27 +499,29 @@ export function ResourceDetails({
               </div>
             </div>
 
+            {/* DURATION */}
+
             <div className="mt-7 text-sm text-slate-600">
               <p className="flex items-center gap-2">
+
                 <Clock3
                   size={16}
                   className="text-slate-400"
                 />
 
                 {studyGroup
-                  ? `Sessions usually run for ${
-                      resource.duration_minutes ??
-                      60
-                    } minutes`
-                  : `Mentorship sessions are usually ${
-                      resource.duration_minutes ??
-                      60
-                    } minutes`}
+                  ? `Study sessions usually run for ${sessionDuration} minutes`
+                  : `Mentorship sessions are usually ${sessionDuration} minutes`}
               </p>
             </div>
           </div>
 
+          {/* =================================================
+              RIGHT SIDE
+          ================================================= */}
+
           <div className="border-t border-slate-200 p-6 md:border-l md:border-t-0 md:p-8">
+
             <h2 className="text-base font-semibold text-slate-800">
               About
             </h2>
@@ -348,148 +554,335 @@ export function ResourceDetails({
           </div>
         </div>
 
-        <div className="border-t border-slate-200 p-5 sm:p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        {/* =================================================
+            AVAILABILITY
+        ================================================= */}
 
-            <div className="min-w-0 flex-1">
-              <h2 className="text-base font-semibold text-slate-800">
+        <div className="border-t border-slate-200 p-5 sm:p-6 md:p-8">
+
+          <div className="max-w-3xl">
+
+            {/* AVAILABILITY TITLE */}
+
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">
                 {studyGroup
-                  ? "Upcoming Sessions"
-                  : "Next Available Slots"}
+                  ? "Upcoming Study Sessions"
+                  : "Choose an Available Session"}
               </h2>
 
-              {!canBook ? (
-                <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-5 py-6">
-                  <p className="text-sm font-medium text-slate-700">
-                    Booking is
-                    currently
-                    unavailable
-                    for this
-                    resource.
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Check back
-                    when the
-                    resource
-                    status changes
-                    to available.
-                  </p>
-                </div>
-              ) : availabilityLoading ? (
-                <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-                  {Array.from({
-                    length: 3,
-                  }).map(
-                    (
-                      _,
-                      index
-                    ) => (
-                      <div
-                        key={
-                          index
-                        }
-                        className="h-[105px] animate-pulse rounded-lg border border-slate-200 bg-slate-50"
-                      />
-                    )
-                  )}
-                </div>
-              ) : availabilityError ? (
-                <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-5 py-5">
-                  <p className="text-sm font-medium text-red-700">
-                    Availability
-                    could not
-                    be loaded.
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      refetchAvailability()
-                    }
-                    className="mt-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
-                  >
-                    Try again
-                  </button>
-                </div>
-              ) : availability.length ===
-                0 ? (
-                <div className="mt-4 rounded-lg border border-dashed border-slate-200 px-5 py-6">
-                  <p className="text-sm font-medium text-slate-700">
-                    {studyGroup
-                      ? "No upcoming sessions."
-                      : "No upcoming availability."}
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Check back
-                    later for
-                    new sessions.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-                  {availability
-                    .slice(
-                      0,
-                      5
-                    )
-                    .map(
-                      (
-                        slot
-                      ) => (
-                        <Link
-                          key={
-                            slot.id
-                          }
-                          href={`/book/${resource.id}?slot=${slot.id}`}
-                          className="rounded-lg border border-slate-200 px-4 py-4 text-center transition hover:border-primary-300 hover:bg-primary-50"
-                        >
-                          <p className="text-sm font-semibold text-slate-700">
-                            {formatSlotDay(
-                              slot.start_time
-                            )}
-                          </p>
-
-                          <p className="mt-1 text-sm text-slate-500">
-                            {formatSlotDate(
-                              slot.start_time
-                            )}
-                          </p>
-
-                          <p className="mt-2 text-sm font-semibold text-primary-700">
-                            {formatSlotTime(
-                              slot.start_time
-                            )}
-                          </p>
-
-                          <p className="mt-1 text-xs text-slate-400">
-                            to{" "}
-                            {formatSlotTime(
-                              slot.end_time
-                            )}
-                          </p>
-                        </Link>
-                      )
-                    )}
-                </div>
-              )}
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                {studyGroup
+                  ? "Choose an available study date and session time."
+                  : "Select a day and choose a convenient one-hour mentorship session."}
+              </p>
             </div>
 
-            {canBook &&
-              !availabilityLoading &&
-              !availabilityError &&
-              availability.length >
-                0 && (
-                <Link
-                  href={`/book/${resource.id}?slot=${availability[0].id}`}
-                  className="flex h-11 shrink-0 items-center justify-center rounded-lg bg-primary-600 px-6 text-sm font-semibold text-white transition hover:bg-primary-700"
+            {/* =============================================
+                RESOURCE UNAVAILABLE
+            ============================================= */}
+
+            {!canBook ? (
+              <div className="mt-5 rounded-lg border border-dashed border-slate-200 px-5 py-6">
+
+                <p className="text-sm font-medium text-slate-700">
+                  Booking is currently unavailable for this resource.
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Check back when the resource status changes to available.
+                </p>
+              </div>
+
+            ) : availabilityLoading ? (
+
+              /* ===========================================
+                 AVAILABILITY LOADING
+              =========================================== */
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+
+                <div className="h-20 animate-pulse rounded-lg bg-slate-100" />
+
+                <div className="h-20 animate-pulse rounded-lg bg-slate-100" />
+              </div>
+
+            ) : availabilityError ? (
+
+              /* ===========================================
+                 AVAILABILITY ERROR
+              =========================================== */
+
+              <div className="mt-5 rounded-lg border border-red-100 bg-red-50 px-5 py-5">
+
+                <p className="text-sm font-medium text-red-700">
+                  Availability could not be loaded.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    refetchAvailability()
+                  }
+                  className="mt-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
                 >
+                  Try again
+                </button>
+              </div>
+
+            ) : availability.length ===
+                0 ? (
+
+              /* ===========================================
+                 NO AVAILABILITY
+              =========================================== */
+
+              <div className="mt-5 rounded-lg border border-dashed border-slate-200 px-5 py-6">
+
+                <p className="text-sm font-medium text-slate-700">
                   {studyGroup
-                    ? "Join Next Session"
-                    : "Book Next Slot"}
-                </Link>
-              )}
+                    ? "No upcoming study sessions."
+                    : "No upcoming availability."}
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Check back later for new sessions.
+                </p>
+              </div>
+
+            ) : (
+
+              /* ===========================================
+                 DATE + TIME SELECTORS
+              =========================================== */
+
+              <div className="mt-6">
+
+                <div className="grid gap-5 sm:grid-cols-2">
+
+                  {/* =======================================
+                      DATE SELECT
+                  ======================================= */}
+
+                  <div>
+                    <label
+                      htmlFor="booking-date"
+                      className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                      {studyGroup
+                        ? "Choose a study day"
+                        : "Choose a day"}
+                    </label>
+
+                    <div className="relative">
+
+                      <CalendarDays
+                        size={18}
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      />
+
+                      <select
+                        id="booking-date"
+                        value={
+                          activeDate
+                        }
+                        onChange={(
+                          event
+                        ) => {
+                          setSelectedDate(
+                            event
+                              .target
+                              .value
+                          );
+
+                          setSelectedSlotId(
+                            ""
+                          );
+                        }}
+                        className="h-12 w-full appearance-none rounded-lg border border-slate-200 bg-white pl-11 pr-10 text-sm font-medium text-slate-700 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                      >
+                        {availableDates.map(
+                          (
+                            date
+                          ) => (
+                            <option
+                              key={
+                                date.value
+                              }
+                              value={
+                                date.value
+                              }
+                            >
+                              {
+                                date.label
+                              }
+                            </option>
+                          )
+                        )}
+                      </select>
+
+                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                        ▼
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* =======================================
+                      TIME SELECT
+                  ======================================= */}
+
+                  <div>
+                    <label
+                      htmlFor="booking-time"
+                      className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                      {studyGroup
+                        ? "Choose a session time"
+                        : "Choose a time"}
+                    </label>
+
+                    <div className="relative">
+
+                      <Clock3
+                        size={18}
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      />
+
+                      <select
+                        id="booking-time"
+                        value={
+                          selectedSlotId
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          setSelectedSlotId(
+                            event
+                              .target
+                              .value
+                          )
+                        }
+                        className="h-12 w-full appearance-none rounded-lg border border-slate-200 bg-white pl-11 pr-10 text-sm font-medium text-slate-700 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                      >
+                        <option value="">
+                          Select a time
+                        </option>
+
+                        {slotsForSelectedDate.map(
+                          (
+                            slot
+                          ) => (
+                            <option
+                              key={
+                                slot.id
+                              }
+                              value={
+                                slot.id
+                              }
+                            >
+                              {formatSlotTime(
+                                slot.start_time
+                              )}{" "}
+                              -{" "}
+                              {formatSlotTime(
+                                slot.end_time
+                              )}
+                            </option>
+                          )
+                        )}
+                      </select>
+
+                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                        ▼
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-xs text-slate-400">
+                      {
+                        slotsForSelectedDate.length
+                      }{" "}
+                      {slotsForSelectedDate.length ===
+                      1
+                        ? "session"
+                        : "sessions"}{" "}
+                      available on this day.
+                    </p>
+                  </div>
+                </div>
+
+                {/* =========================================
+                    SELECTED SESSION
+                ========================================= */}
+
+                {selectedSlot && (
+                  <div className="mt-6 rounded-xl border border-primary-100 bg-primary-50 p-5">
+
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary-600">
+                          Selected session
+                        </p>
+
+                        <p className="mt-2 font-semibold text-slate-800">
+                          {formatFullDate(
+                            selectedSlot.start_time
+                          )}
+                        </p>
+
+                        <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+
+                          <Clock3
+                            size={15}
+                            className="text-slate-400"
+                          />
+
+                          {formatSlotTime(
+                            selectedSlot.start_time
+                          )}
+
+                          <span>
+                            -
+                          </span>
+
+                          {formatSlotTime(
+                            selectedSlot.end_time
+                          )}
+                        </p>
+                      </div>
+
+                      {/* CONTINUE BUTTON */}
+
+                      <Link
+                        href={`/book/${resource.id}?slot=${selectedSlot.id}`}
+                        className="flex h-11 shrink-0 items-center justify-center rounded-lg bg-primary-600 px-6 text-sm font-semibold text-white transition hover:bg-primary-700"
+                      >
+                        {studyGroup
+                          ? "Continue to Join"
+                          : "Continue to Booking"}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {/* NO TIME SELECTED */}
+
+                {!selectedSlot && (
+                  <div className="mt-5 rounded-lg border border-dashed border-slate-200 px-4 py-3">
+
+                    <p className="text-sm text-slate-500">
+                      Select an available time to continue.
+                    </p>
+                  </div>
+                )}
+
+                {/* TIMEZONE */}
+
+                <p className="mt-4 text-xs text-slate-400">
+                  Times shown in West Africa Time.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>

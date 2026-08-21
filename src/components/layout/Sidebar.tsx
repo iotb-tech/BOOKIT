@@ -8,7 +8,6 @@ import {
 
 import {
   BookOpen,
-  CalendarCheck2,
   CalendarDays,
   LayoutDashboard,
   LogOut,
@@ -76,9 +75,7 @@ export default function Sidebar() {
         className="flex h-20 items-center gap-3 px-7 transition-opacity hover:opacity-80"
       >
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white">
-          <CalendarCheck2
-            size={20}
-          />
+          <CalendarDays size={20} />
         </span>
 
         <span className="text-xl font-semibold text-[#2b2451]">
