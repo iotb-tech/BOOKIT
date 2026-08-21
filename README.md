@@ -7,11 +7,16 @@ Mentor office hours and study-group pairing sessions are currently coordinated a
 
 Also they were some cases 71% occurrence where they found out the time they have chosen was already scheduled with another study group
 
-BookIt aims to solve this blocker by showing real available slots to users and grant them the ability to book one without a single back-and-forth DM, and prevent any cases of double-booking. 
+BookIt aims to solve this blocker by showing real available slots to users and grant them the ability to book one without a single back-and-forth DM, and prevent any cases of double-booking.
 
-| Question asked | Response |
+## Questionnaire data
+
+| Question category | Response Statistics |
 | ---------- | ---------- |
-| This are the numbers of response | ![first image](images/mform1.jpg)   |
+| Role and frequncy of scheduled meeting | ![first image](images/mform1.jpg)   |
+|Availability of mentor or peer|![](images/mform2.jpg)|
+| Missed slots|![](images/mform3.jpg)|
+|People who would like a dedicated tool for booking|![](images/mform4.jpg)|
 
 
 # Getting started
