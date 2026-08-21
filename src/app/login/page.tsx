@@ -1,12 +1,8 @@
-import {
-  Suspense,
-} from "react";
+import { Suspense } from "react";
 
 import Link from "next/link";
 
-import {
-  CalendarCheck2,
-} from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 import LoginForm from "@/components/auth/LoginForm";
 
@@ -25,16 +21,13 @@ export default function LoginPage() {
       />
 
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 lg:px-8">
-
         {/* Brand */}
         <Link
           href="/"
           className="inline-flex w-fit items-center gap-2"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
-            <CalendarCheck2
-              size={20}
-            />
+            <CalendarDays size={20} />
           </span>
 
           <span className="text-xl font-bold text-slate-800">
@@ -45,11 +38,7 @@ export default function LoginPage() {
         {/* Login */}
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-md">
-            <Suspense
-              fallback={
-                <LoginSkeleton />
-              }
-            >
+            <Suspense fallback={<LoginSkeleton />}>
               <LoginForm />
             </Suspense>
           </div>
@@ -62,7 +51,6 @@ export default function LoginPage() {
 function LoginSkeleton() {
   return (
     <div className="w-full rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
-
       <div className="mx-auto h-8 w-44 animate-pulse rounded-md bg-slate-200" />
 
       <div className="mx-auto mt-3 h-4 w-40 animate-pulse rounded-md bg-slate-100" />
