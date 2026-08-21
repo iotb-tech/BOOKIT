@@ -1,10 +1,13 @@
 import Link from "next/link";
+
 import {
   ArrowRight,
   Clock3,
 } from "lucide-react";
 
-import type { Resource } from "@/types/resource";
+import type {
+  Resource,
+} from "@/types/resource";
 
 const avatarStyles = [
   "from-amber-200 to-orange-400",
@@ -17,7 +20,8 @@ function getInitials(
   resource: Resource
 ) {
   if (
-    resource.type === "Study Group"
+    resource.type ===
+    "Study Group"
   ) {
     const team =
       resource.name.match(
@@ -31,17 +35,36 @@ function getInitials(
 
   return resource.name
     .split(" ")
-    .map((word) => word[0])
+    .filter(Boolean)
+    .map(
+      (word) =>
+        word[0]
+    )
     .join("")
     .slice(0, 2)
     .toUpperCase();
 }
 
 function formatAvailability(
-  value?: string | null
+  value?:
+    | string
+    | null
 ) {
   if (!value) {
-    return "Check availability";
+    return "View available slots";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    ) ||
+    date.getTime() <
+      Date.now()
+  ) {
+    return "View available slots";
   }
 
   return new Intl.DateTimeFormat(
@@ -52,31 +75,48 @@ function formatAvailability(
       hour: "numeric",
       minute: "2-digit",
     }
-  ).format(new Date(value));
+  ).format(date);
 }
 
 export function ResourceCard({
   resource,
   index = 0,
 }: {
-  resource: Resource;
+  resource:
+    Resource;
+
   index?: number;
 }) {
   const type =
     resource.type ??
-    (resource.name
-      .toLowerCase()
-      .includes("group")
-      ? "Study Group"
-      : "Mentor");
+    (
+      resource.name
+        .toLowerCase()
+        .includes(
+          "group"
+        )
+        ? "Study Group"
+        : "Mentor"
+    );
 
   const initials =
-    getInitials(resource);
+    getInitials(
+      resource
+    );
 
-  const availabilityLabel =
-    type === "Study Group"
-      ? "Next session"
-      : "Next available";
+  const isAvailable =
+    resource.status ===
+    "available";
+
+  const availabilityText =
+    !isAvailable
+      ? resource.status ===
+        "maintenance"
+        ? "Temporarily unavailable"
+        : "No open slots"
+      : formatAvailability(
+          resource.next_available_at
+        );
 
   return (
     <article className="group flex min-h-[270px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)] transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
@@ -95,7 +135,9 @@ export function ResourceCard({
 
         <div>
           <h2 className="text-base font-semibold text-slate-800">
-            {resource.name}
+            {
+              resource.name
+            }
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
@@ -105,12 +147,16 @@ export function ResourceCard({
       </div>
 
       <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-600">
-        {resource.description}
+        {resource.description ||
+          "Practical learning support through BookIt."}
       </p>
 
       <div className="mt-auto pt-5">
         <p className="text-xs font-medium text-slate-400">
-          {availabilityLabel}
+          {type ===
+          "Study Group"
+            ? "Next session"
+            : "Next available"}
         </p>
 
         <div className="mt-2 flex items-center gap-2 text-sm font-medium text-slate-600">
@@ -119,12 +165,9 @@ export function ResourceCard({
             className="text-slate-400"
           />
 
-          {resource.status ===
-          "unavailable"
-            ? "No open slots"
-            : formatAvailability(
-                resource.next_available_at
-              )}
+          {
+            availabilityText
+          }
         </div>
 
         <Link
@@ -132,7 +175,10 @@ export function ResourceCard({
           className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-primary-200 bg-primary-50/40 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-50"
         >
           View Availability
-          <ArrowRight size={15} />
+
+          <ArrowRight
+            size={15}
+          />
         </Link>
       </div>
     </article>

@@ -12,11 +12,11 @@ export default function Hero() {
 
   return (
     <section className="overflow-hidden bg-white">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:px-8 lg:py-20">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-16 pt-8 sm:pt-10 lg:grid-cols-2 lg:gap-14 lg:px-8 lg:pb-20 lg:pt-12">
         
         {/* LEFT */}
         <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 sm:text-base">
             <span className="h-2 w-2 rounded-full bg-primary-600" />
             Mentorship made simple
           </div>
@@ -31,7 +31,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 sm:text-xl sm:leading-9">
             Book one-on-one sessions with mentors or join study groups with
             your peers. Find the right time, avoid double-booking, and stay
             focused.

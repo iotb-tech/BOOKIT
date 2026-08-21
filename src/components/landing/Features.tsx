@@ -26,7 +26,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="scroll-mt-24 border-t border-neutral-100 bg-white px-5 py-8 sm:px-8 lg:px-10"
+      className="border-t border-neutral-100 bg-white px-5 py-10 sm:px-8 sm:py-12 lg:px-10"
     >
       <div className="mx-auto grid max-w-7xl gap-7 md:grid-cols-3">
         {features.map(({ icon: Icon, title, description }) => (
@@ -39,11 +39,11 @@ export default function Features() {
             </span>
 
             <div>
-              <h2 className="text-sm font-bold text-[#24233c]">
+              <h2 className="text-base font-bold text-[#24233c] sm:text-lg">
                 {title}
               </h2>
 
-              <p className="mt-1 text-xs leading-5 text-neutral-500">
+              <p className="mt-1.5 text-sm leading-6 text-neutral-500 sm:text-base">
                 {description}
               </p>
             </div>

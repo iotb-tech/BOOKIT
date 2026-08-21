@@ -81,28 +81,28 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <a
               href="#features"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-primary-600"
+              className="text-base font-medium text-slate-600 transition-colors hover:text-primary-600"
             >
               Features
             </a>
 
             <a
               href="#how-it-works"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-primary-600"
+              className="text-base font-medium text-slate-600 transition-colors hover:text-primary-600"
             >
               How It Works
             </a>
 
             <Link
               href="/resources"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-primary-600"
+              className="text-base font-medium text-slate-600 transition-colors hover:text-primary-600"
             >
               Resources
             </Link>
 
             <a
               href="#about"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-primary-600"
+              className="text-base font-medium text-slate-600 transition-colors hover:text-primary-600"
             >
               About
             </a>

@@ -1,18 +1,44 @@
 import Link from "next/link";
-import { CalendarCheck2 } from "lucide-react";
+
+import { CalendarDays } from "lucide-react";
+
 import SignupForm from "@/components/auth/SignupForm";
 
 export default function SignupPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#faf9ff] px-5 py-7">
-      <div className="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-primary-100/70" />
-      <div className="pointer-events-none absolute -right-32 top-16 h-80 w-80 rounded-full bg-primary-50" />
-      <Link href="/" className="relative z-10 mx-auto flex max-w-7xl items-center gap-2.5 text-[#2b2451]">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white"><CalendarCheck2 size={18} /></span>
-        <span className="text-lg font-bold">BookIt</span>
-      </Link>
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-[450px] items-center justify-center py-5">
-        <SignupForm />
+    <main className="relative min-h-screen overflow-hidden bg-[#fbfaff]">
+      {/* Decorative circles */}
+      <div
+        aria-hidden="true"
+        className="absolute -right-24 top-16 h-72 w-72 rounded-full bg-primary-50"
+      />
+
+      <div
+        aria-hidden="true"
+        className="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-primary-100/60"
+      />
+
+      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 lg:px-8">
+        {/* Brand */}
+        <Link
+          href="/"
+          className="inline-flex w-fit items-center gap-2"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
+            <CalendarDays size={20} />
+          </span>
+
+          <span className="text-xl font-bold text-slate-800">
+            BookIt
+          </span>
+        </Link>
+
+        {/* Signup */}
+        <div className="flex flex-1 items-center justify-center py-10">
+          <div className="w-full max-w-md">
+            <SignupForm />
+          </div>
+        </div>
       </div>
     </main>
   );

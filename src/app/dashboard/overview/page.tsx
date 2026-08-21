@@ -4,6 +4,8 @@ import { getBookingsForCurrentUser } from "@/lib/bookings";
 import { getCurrentUser } from "@/lib/auth/actions";
 import type { Booking } from "@/types/booking";
 
+export const dynamic = "force-dynamic";
+
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const hours = [9, 10, 11, 12, 13, 14];
 

@@ -43,18 +43,18 @@ export default function ResourcesPreview() {
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
 
           <div>
-            <p className="font-semibold text-primary-600">
+            <p className="text-sm font-bold uppercase tracking-wide text-primary-600">
               EXPLORE
             </p>
 
-            <h2 className="mt-2 text-3xl font-bold text-slate-950">
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
               Find the right learning resource
             </h2>
           </div>
 
           <Link
             href="/resources"
-            className="inline-flex items-center gap-2 font-semibold text-primary-600 hover:text-primary-700"
+            className="inline-flex items-center gap-2 text-base font-semibold text-primary-600 hover:text-primary-700"
           >
             View all resources
             <ArrowRight size={18} />
@@ -78,11 +78,11 @@ export default function ResourcesPreview() {
                   <Icon size={23} />
                 </div>
 
-                <h3 className="mt-5 font-bold text-slate-800">
+                <h3 className="mt-5 text-lg font-bold text-slate-800">
                   {resource.title}
                 </h3>
 
-                <p className="mt-3 text-sm leading-6 text-slate-600">
+                <p className="mt-3 text-base leading-7 text-slate-600">
                   {resource.description}
                 </p>
 

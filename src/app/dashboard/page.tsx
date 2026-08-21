@@ -15,6 +15,8 @@ import { getCurrentUser } from "@/lib/auth/actions";
 import AppShell from "@/components/layout/AppShell";
 import PageBadge from "@/components/ui/PageBadge";
 
+export const dynamic = "force-dynamic";
+
 /* =========================================================
    FORMATTERS
 ========================================================= */

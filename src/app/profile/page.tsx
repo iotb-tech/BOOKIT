@@ -2,6 +2,8 @@ import AppShell from "@/components/layout/AppShell";
 import PageBadge from "@/components/ui/PageBadge";
 import { getCurrentUser } from "@/lib/auth/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const user = await getCurrentUser();
 
